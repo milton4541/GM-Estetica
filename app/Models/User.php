@@ -2,49 +2,49 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+        use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    // Si tu tabla no se llama "users", cámbialo aquí:
+    protected $table = 'users';
+
+    // Clave primaria personalizada
+    protected $primaryKey = 'id_usuario';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    // Asignación masiva: estos campos podrán rellenarse vía create/update
     protected $fillable = [
-        'name',
+        'nombre',
+        'apellido',
         'email',
-        'password',
+        'contrasena',
+        'nombre_usuario',
+        'id_rol',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    // Ocultar estos campos cuando serialices el modelo (p. ej. al devolver JSON)
     protected $hidden = [
-        'password',
-        'remember_token',
+        'contrasena',
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Mutator: al asignar $user->contrasena = 'texto',
+     * automáticamente se guardará como bcrypt('texto').
      */
-    protected function casts(): array
+    public function setContrasenaAttribute($value)
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        $this->attributes['contrasena'] = bcrypt($value);
+    }
+
+    /**
+     * Relación: cada usuario pertenece a un rol.
+     */
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 }

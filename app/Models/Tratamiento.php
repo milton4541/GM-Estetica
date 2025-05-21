@@ -2,24 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Tratamiento extends Model
 {
-    use HasFactory;
+    protected $primaryKey = 'id_tratamiento';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
+    // Asignación masiva: estos campos podrán rellenarse vía create/update
     protected $fillable = [
-        'paciente_id',
-        'fecha',
-        'motivo',
-        'diagnostico',
-        'tratamiento',
+        'descripcion',
+        'duracion',
+        'precio',
     ];
-
-    public function paciente()
-    {
-        return $this->belongsTo(Paciente::class);
-    }
 }
-

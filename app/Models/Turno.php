@@ -2,23 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Turno extends Model
 {
-    use HasFactory;
+    protected $primaryKey = 'id_turno';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
+    // Asignación masiva
     protected $fillable = [
-        'paciente_id',
-        'fecha_turno',
-        'hora_turno',
-        'estado',
-        'observaciones',
+        'fecha',
+        'hora',
+        'id_tratamiento',
+        'id_paciente',
     ];
 
+    // Relación: un turno pertenece a un tratamiento
+    public function tratamiento()
+    {
+        return $this->belongsTo(Tratamiento::class, 'id_tratamiento', 'id_tratamiento');
+    }
+
+    // Relación: un turno pertenece a un paciente
     public function paciente()
     {
-        return $this->belongsTo(Paciente::class);
+        return $this->belongsTo(Paciente::class, 'id_paciente', 'id_paciente');
     }
 }

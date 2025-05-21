@@ -7,13 +7,13 @@ use App\Http\Controllers\Api\TratamientoController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TurnoController;
 
-
-Route::get('ping', function () {
-    return response()->json(['message' => 'pong']);
+Route::middleware('api')->group(function () {
+    Route::apiResource('pacientes', PacienteController::class);
 });
 
-Route::apiResource('consultas', TratamientoController::class);
-Route::apiResource('pacientes', PacienteController::class);
+Route::post('/paciente', [PacienteController::class, 'store']);
+
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
