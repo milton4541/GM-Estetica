@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 class PacienteController extends Controller
 {
     // Mostrar todos los pacientes
-    public function index()
+    public function getPacientes()
     {
         $pacientes = Paciente::all();
 
@@ -25,7 +25,7 @@ class PacienteController extends Controller
     }
 
     // Crear un nuevo paciente
-     public function store(Request $request): JsonResponse
+     public function createPaciente(Request $request): JsonResponse
     {
         // 1. Definimos reglas y mensajes
         $validator = Validator::make($request->all(), [
