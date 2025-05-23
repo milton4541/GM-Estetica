@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model
+class User extends Model implements JWTSubject
 {
-        use Notifiable;
+    use Notifiable;
 
     // Si tu tabla no se llama "users", cámbialo aquí:
     protected $table = 'users';
@@ -46,5 +48,12 @@ class User extends Model
     public function rol()
     {
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
+
+    public function getJWTIdentifier(){
+        return $this->getKey();
+    }
+    public function getJWTCustomClaims(){
+        return [];
     }
 }
