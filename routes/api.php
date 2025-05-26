@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsUserAuth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PacienteController;
@@ -7,31 +9,23 @@ use App\Http\Controllers\Api\TratamientoController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TurnoController;
 
-// Route::middleware('api')->group(function () {
-//     Route::apiResource('pacientes', PacienteController::class);
-// });
+//rutas publicas
+Route::post('register',[AuthController::class,'register']);
+Route::post('login',[AuthController::class,'login']);
 
-Route::get('/paciente', [PacienteController::class,'getPacientes']);
-Route::post('/paciente', [PacienteController::class, 'createPaciente']); //alta paciente
+//rutas privadas (necesitas auth)
+Route::middleware([IsUserAuth::class])->group(function () {
+    Route::controller(PacienteController::class)->group(function () {
+        Route::get('pacientes','getPacientes');
+        Route::post('paciente', 'createPaciente');
+        Route::get('/paciente/{id}','getPacienteById');
+        Route::patch('/paciente/{id}','updatePaciente');
+        Route::delete('/paciente/{id}','deletePaciente');
+        });
+    //rutas que solo tiene acceso el admin y esta autenticado
+    Route::middleware([IsAdmin::class])->group(function () { 
 
-
-// Route::post('/register', [AuthController::class, 'register']);
-// Route::post('/login', [AuthController::class, 'login']);
-// Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::apiResource('pacientes', PacienteController::class);
-// });
-
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::apiResource('consultas', TratamientoController::class);
-// });
-
-// Route::get('/pacientes/{pacienteId}/consultas', [TratamientoController::class, 'consultasPorPaciente'])
-//     ->middleware('auth:sanctum');
+    });
+});
 
 
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::apiResource('turnos', TurnoController::class);
-// });
-    

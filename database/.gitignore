@@ -1,1 +1,40 @@
-*.sqlite*
+# Laravel
+/vendor
+/node_modules
+/public/storage
+/storage/*.key
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+database/*.sqlite
+database/database.sqlite
+/storage/logs/*.log
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Jetstream / Breeze / Fortify / Sanctum tokens
+public/hot
+public/mix-manifest.json
+public/build
+/public/js
+/public/css
+/public/mix-manifest.json
+
+# Composer
+composer.lock
+
+# IDEs & OS
+*.log
+*.DS_Store
+.idea
+*.vscode
+*.swp
+Thumbs.db
+*.bak
+*.tmp
+*.sublime-*

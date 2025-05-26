@@ -66,7 +66,7 @@ class PacienteController extends Controller
     }
 
     // Mostrar un paciente específico
-    public function show($id)
+    public function getPacienteById($id)
     {
         $paciente = Paciente::find($id);
 
@@ -75,12 +75,13 @@ class PacienteController extends Controller
         }
 
         return response()->json([
+            'message'  => 'Paciente encontrado correctamente',
             'paciente' => $paciente,
-        ]);
+        ],200);
     }
 
     // Actualizar un paciente existente
-    public function update(Request $request, $id)
+    public function updatePaciente(Request $request, $id)
     {
         $paciente = Paciente::find($id);
 
@@ -102,11 +103,11 @@ class PacienteController extends Controller
         return response()->json([
             'message' => 'Paciente actualizado exitosamente',
             'paciente' => $paciente,
-        ]);
+        ], 200);
     }
 
     // Eliminar un paciente
-    public function destroy($id)
+    public function deletePaciente($id)
     {
         $paciente = Paciente::find($id);
 
@@ -118,6 +119,6 @@ class PacienteController extends Controller
 
         return response()->json([
             'message' => 'Paciente eliminado exitosamente',
-        ]);
+        ], 200);
     }
 }

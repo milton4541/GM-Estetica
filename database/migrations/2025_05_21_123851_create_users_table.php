@@ -25,8 +25,8 @@ return new class extends Migration
             // FK al rol
             $table->unsignedInteger('id_rol');
             $table->foreign('id_rol')
-                  ->references('id_rol')
-                  ->on('roles')
+                  ->references('id')
+                  ->on('rols')
                   ->onDelete('cascade');
 
             // created_at y updated_at
