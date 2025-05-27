@@ -44,24 +44,33 @@ public function register(Request $request)
 }
     // Login de usuario
     public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'nombre_usuario' => 'required|string',
-            'password' => 'required|string',
-        ]);
-        if( $validator->fails() ) {
-            return response()->json(['error' => $validator->errors()],422);
+{
+    $validator = Validator::make($request->all(), [
+        'nombre_usuario' => 'required|string',
+        'password' => 'required|string',
+    ]);
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
+    $credentials = [
+        'nombre_usuario' => $request->nombre_usuario,
+        'password' => $request->password,
+    ];
+    try {
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
-        $credentials = $request->only(['email','password']);
-        try {
-            if(!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error'=> 'Credenciales Invalidas'],401);
-            }
-        }catch(JWTException $e){
-            return response()->json(['error'=> 'No se creo el token', $e],500);
-        }
+    } catch (JWTException $e) {
+        return response()->json(['error' => 'No se pudo crear el token'], 500);
     }
 
+    return response()->json([
+        'access_token' => $token,
+        'token_type' => 'bearer',
+        'expires_in' => auth('api')->factory()->getTTL() * 60,
+        'user' => auth('api')->user(),
+    ]);
+}
     public function getUser()
     {
         $user = Auth::user();

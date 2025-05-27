@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('nombre', 100);
             $table->string('apellido', 100);
             $table->string('email')->unique();
-            $table->string('contrasena');
+            $table->string('password');
             $table->string('nombre_usuario', 50)->unique();
 
             // FK al rol

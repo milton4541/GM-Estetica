@@ -10,7 +10,8 @@
  */
 
 return [
-
+    'identifier' => 'id_usuario',
+    'user'       => App\Models\User::class,
     /*
     |--------------------------------------------------------------------------
     | JWT Authentication Secret

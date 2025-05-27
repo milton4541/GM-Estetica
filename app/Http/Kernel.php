@@ -32,6 +32,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
+
 class Kernel extends HttpKernel
 {
     protected $middleware = [
@@ -58,7 +59,7 @@ class Kernel extends HttpKernel
             SubstituteBindings::class,
         ],
     ];
-
+    
     protected $middlewareAliases = [
         'auth' => Authenticate::class,
         'auth.basic' => AuthenticateWithBasicAuth::class,

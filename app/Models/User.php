@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Model implements JWTSubject
-{
+class User extends Authenticatable implements JWTSubject{
     use Notifiable;
-
     // Si tu tabla no se llama "users", cámbialo aquí:
     protected $table = 'users';
 
@@ -23,24 +22,24 @@ class User extends Model implements JWTSubject
         'nombre',
         'apellido',
         'email',
-        'contrasena',
+        'password',
         'nombre_usuario',
         'id_rol',
     ];
 
     // Ocultar estos campos cuando serialices el modelo (p. ej. al devolver JSON)
     protected $hidden = [
-        'contrasena',
+        'password',
     ];
 
     /**
-     * Mutator: al asignar $user->contrasena = 'texto',
+     * Mutator: al asignar $user->password = 'texto',
      * automáticamente se guardará como bcrypt('texto').
      */
-    public function setContrasenaAttribute($value)
-    {
-        $this->attributes['contrasena'] = bcrypt($value);
-    }
+    // public function setPasswordAttribute($value)
+    // {
+    //     $this->attributes['password'] = bcrypt($value);
+    // }
 
     /**
      * Relación: cada usuario pertenece a un rol.
@@ -49,11 +48,18 @@ class User extends Model implements JWTSubject
     {
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
+    public function getAuthIdentifierName()
+    {
+        return 'nombre_usuario';
+    }
 
-    public function getJWTIdentifier(){
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
-    public function getJWTCustomClaims(){
+
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 }

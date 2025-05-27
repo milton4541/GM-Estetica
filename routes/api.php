@@ -16,7 +16,7 @@ Route::post('login',[AuthController::class,'login']);
 //rutas privadas (necesitas auth)
 Route::middleware([IsUserAuth::class])->group(function () {
     Route::controller(PacienteController::class)->group(function () {
-        Route::get('pacientes','getPacientes');
+        Route::get('/paciente','getPacientes');
         Route::post('paciente', 'createPaciente');
         Route::get('/paciente/{id}','getPacienteById');
         Route::patch('/paciente/{id}','updatePaciente');
@@ -27,5 +27,3 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     });
 });
-
-
