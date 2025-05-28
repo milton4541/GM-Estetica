@@ -16,4 +16,13 @@ class Tratamiento extends Model
         'duracion',
         'precio',
     ];
+    public function insumos()
+{
+    return $this->belongsToMany(
+        Insumo::class,
+        'tratamiento_insumo',
+        'id_tratamiento',
+        'id_insumo'
+    );
+}
 }

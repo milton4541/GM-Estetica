@@ -23,4 +23,13 @@ class Insumo extends Model
     protected $casts = [
         'fecha_expiracion' => 'date',
     ];
+    public function tratamientos()
+    {
+        return $this->belongsToMany(
+            Tratamiento::class,
+            'tratamiento_insumo',
+            'id_insumo',
+            'id_tratamiento'
+        );
+    }
 }
