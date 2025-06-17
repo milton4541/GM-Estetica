@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\InsumoController;
 use App\Http\Controllers\Api\TratamientoController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TurnoController;
+use App\Http\Controllers\Api\TratamientoInsumoController;
 
 //rutas publicas
 Route::post('register',[AuthController::class,'register']);
@@ -59,5 +60,6 @@ Route::middleware([IsUserAuth::class])->group(function () {
     //rutas que solo tiene acceso el admin y esta autenticado
     Route::middleware([IsAdmin::class])->group(function () { 
 
+    Route::apiResource('tratamiento_insumo', TratamientoInsumoController::class);
     });
 });
