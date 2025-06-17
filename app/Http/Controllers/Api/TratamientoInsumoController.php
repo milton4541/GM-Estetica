@@ -10,7 +10,12 @@ class TratamientoInsumoController extends Controller
 {
     public function index()
     {
-        return response()->json(TratamientoInsumo::all());
+        $data = TratamientoInsumo::all();
+        return response()->json([
+            'success' => true,
+            'data'    => $data,
+            'message' => 'Listado de relaciones obtenido exitosamente',
+        ], 200);
     }
 
     public function store(Request $request)
@@ -21,12 +26,21 @@ class TratamientoInsumoController extends Controller
         ]);
 
         $relacion = TratamientoInsumo::create($data);
-        return response()->json($relacion, 201);
+        return response()->json([
+            'success' => true,
+            'data'    => $relacion,
+            'message' => 'Relación creada exitosamente',
+        ], 201);
     }
 
     public function show($id)
     {
-        return response()->json(TratamientoInsumo::findOrFail($id));
+        $relacion = TratamientoInsumo::findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'data'    => $relacion,
+            'message' => 'Relación obtenida exitosamente',
+        ], 200);
     }
 
     public function update(Request $request, $id)
@@ -39,7 +53,11 @@ class TratamientoInsumoController extends Controller
         ]);
 
         $relacion->update($data);
-        return response()->json($relacion);
+        return response()->json([
+            'success' => true,
+            'data'    => $relacion,
+            'message' => 'Relación actualizada exitosamente',
+        ], 200);
     }
 
     public function destroy($id)
@@ -47,6 +65,10 @@ class TratamientoInsumoController extends Controller
         $relacion = TratamientoInsumo::findOrFail($id);
         $relacion->delete();
 
-        return response()->json(['message' => 'Relación eliminada correctamente']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Relación eliminada correctamente',
+        ], 200);
     }
 }
+
