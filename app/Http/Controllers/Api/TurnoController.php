@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Turno;
+use App\Models\Historial;
 use Validator;
 
 class TurnoController extends Controller
@@ -105,7 +106,13 @@ class TurnoController extends Controller
     $data = $validator->validated();
     $data['fecha'] = Carbon::createFromFormat('d/m/Y', $data['fecha'])->format('Y-m-d');
     $turno = Turno::create($data);
-    
+    Historial::create([
+        'id_paciente'    => $turno->id_paciente,
+        'id_tratamiento' => $turno->id_tratamiento,
+        'fecha'          => $turno->fecha,
+        // puedes poner un mensaje genérico o dejar observaciones vacías
+        'observaciones'  => 'Turno agendado para ' . $turno->fecha . ' a las ' . $turno->hora,
+    ]);
     return response()->json([
         'success' => true,
         'data'    => $turno,

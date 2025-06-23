@@ -59,6 +59,12 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        'archivos' => [
+        'driver'     => 'local',
+        'root'       => public_path('archivos'),
+        'url'        => env('APP_URL').'/archivos',
+        'visibility' => 'public',
+    ],
 
     ],
 

@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\DocumentoController;
 use App\Http\Controllers\Api\FacturaController;
+use App\Http\Controllers\Api\HistorialController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsUserAuth;
 use Illuminate\Http\Request;
@@ -57,9 +59,16 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::patch(  'factura/{id}',    'updateFactura');
         Route::delete( 'factura/{id}',    'deleteFactura');
     });
+    Route::controller(HistorialController::class)->group(function(){
+        Route::get('historial', 'getHistorial');
+    });
     //rutas que solo tiene acceso el admin y esta autenticado
     Route::middleware([IsAdmin::class])->group(function () { 
-
-    Route::apiResource('tratamiento_insumo', TratamientoInsumoController::class);
+        
+        Route::apiResource('tratamiento_insumo', TratamientoInsumoController::class);
     });
+});
+Route::controller(DocumentoController::class)->group(function(){
+    Route::get('documento', 'getDoc');
+    Route::post('documento', 'createDoc');
 });
