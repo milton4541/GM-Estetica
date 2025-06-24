@@ -17,6 +17,7 @@ class Insumo extends Model
         'cantidad',
         'nombre',
         'fecha_expiracion',
+        'cantidad_min',
     ];
 
     // Cast de fechas

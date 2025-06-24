@@ -18,6 +18,14 @@ class InsumoController extends Controller
                 'success' => false,
             ],404);
         }
+
+    
+    // Agregar alertaBajoStock a cada insumo
+    $insumosConAlerta = $insumo->map(function($insumo){
+        $insumo->alertaBajoStock = ($insumo->cantidad <= $insumo->cantidad_min);
+        return $insumo;
+    });
+
         return response()->json([
             'message'=> 'Insumos encontrados correctamente',
             'data' => $insumo,

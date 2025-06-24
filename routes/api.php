@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\TratamientoController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TurnoController;
 use App\Http\Controllers\Api\TratamientoInsumoController;
+use App\Http\Controllers\Api\ReporteAdministrativoController;
 
 //rutas publicas
 Route::post('register',[AuthController::class,'register']);
@@ -59,14 +60,24 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::patch(  'factura/{id}',    'updateFactura');
         Route::delete( 'factura/{id}',    'deleteFactura');
     });
+    
     Route::controller(HistorialController::class)->group(function(){
         Route::get('historial', 'getHistorial');
     });
-    //rutas que solo tiene acceso el admin y esta autenticado
-    Route::middleware([IsAdmin::class])->group(function () { 
-        
-        Route::apiResource('tratamiento_insumo', TratamientoInsumoController::class);
+    
+    Route::controller(TratamientoInsumoController::class)->group(function () {
+        Route::get(    'tratamientos-insumos',       'getRelaciones');
+        Route::get(    'tratamiento-insumo/{id}',    'getRelacionById');
+        Route::post(   'tratamiento-insumo',         'createRelacion');
+        Route::patch(  'tratamiento-insumo/{id}',    'updateRelacion');
+        Route::delete( 'tratamiento-insumo/{id}',    'deleteRelacion');
     });
+
+    Route::controller(ReporteAdministrativoController::class)->group(function () {
+    Route::get('reportes/ingresos-totales', 'ingresosTotales');
+    Route::get('reportes/ingresos-mensuales', 'ingresosPorMes');
+    Route::get('reportes/rendimiento-tratamientos', 'rendimientoPorTratamiento');
+});
 });
 Route::controller(DocumentoController::class)->group(function(){
     Route::get('documento', 'getDoc');
