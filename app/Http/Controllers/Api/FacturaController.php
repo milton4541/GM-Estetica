@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Factura;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Mail\FacturaMail;
+use Illuminate\Support\Facades\Mail;
 use Validator;
 
 class FacturaController extends Controller
@@ -26,7 +28,7 @@ class FacturaController extends Controller
             'importe'               => 'required|numeric|min:0',
             'descuento_precio'      => 'nullable|numeric|min:0',
             'descuento_porcentaje'  => 'nullable|numeric|min:0|max:100',
-            'importe_final'         => 'required|numeric|min:0',
+            'importe_final'         => 'nullable|numeric|min:0',
             'id_paciente'           => 'required|integer|exists:pacientes,id_paciente',
             'id_tratamiento'        => 'required|integer|exists:tratamientos,id_tratamiento',
         ], [
@@ -166,4 +168,27 @@ class FacturaController extends Controller
         ], 200);
     }
 
+/**
+     * Envía la factura por email al paciente.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function enviarMail($id)
+    {
+        // Recuperar factura con relaciones
+        $factura = Factura::with(['paciente', 'tratamiento'])->findOrFail($id);
+        //dd($factura->paciente);
+        // Email del paciente (asegúrate de que el modelo Paciente tenga el campo 'email')
+        $email = $factura->paciente->email;
+
+        // Enviar correo
+        Mail::to($email)->send(new FacturaMail($factura));
+
+        // Opcional: redirigir con mensaje de éxito
+        return response()->json([
+            'status'  => 'success',
+            'message' => "Factura enviada correctamente a {$email}"
+        ], 200);    
+    }
 }

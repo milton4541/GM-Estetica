@@ -65,6 +65,7 @@ return [
         'url'        => env('APP_URL').'/archivos',
         'visibility' => 'public',
     ],
+    
 
     ],
 

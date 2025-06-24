@@ -20,13 +20,7 @@ Route::post('login',[AuthController::class,'login']);
 
 //rutas privadas (necesitas auth)
 Route::middleware([IsUserAuth::class])->group(function () {
-    Route::controller(PacienteController::class)->group(function () {
-        Route::get('paciente','getPacientes');
-        Route::post('paciente', 'createPaciente');
-        Route::get('/paciente/{id}','getPacienteById');
-        Route::patch('/paciente/{id}','updatePaciente');
-        Route::delete('/paciente/{id}','deletePaciente');
-    });
+
 
     Route::controller(TratamientoController::class)->group(function () {
         Route::get('tratamiento', 'getTratamientos');
@@ -52,15 +46,14 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::delete('insumo/{id}',    'deleteInsumo');
     });
 
-    Route::controller(FacturaController::class)->group(function () {
-        Route::get(    'facturas',        'getFacturas');
-        Route::get(    'factura/{id}',    'getFacturaById');
-        Route::post(   'factura',         'createFactura');
-        Route::patch(  'factura/{id}',    'updateFactura');
-        Route::delete( 'factura/{id}',    'deleteFactura');
-    });
     Route::controller(HistorialController::class)->group(function(){
         Route::get('historial', 'getHistorial');
+    });
+    Route::controller(DocumentoController::class)->group(function(){
+        Route::get('documento', 'getDoc');
+        Route::get('documento/{id}', 'download');
+        Route::post('documento', 'createDoc');
+        Route::delete('documento/{id}', 'deleteFromBD'); 
     });
     //rutas que solo tiene acceso el admin y esta autenticado
     Route::middleware([IsAdmin::class])->group(function () { 
@@ -68,7 +61,18 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::apiResource('tratamiento_insumo', TratamientoInsumoController::class);
     });
 });
-Route::controller(DocumentoController::class)->group(function(){
-    Route::get('documento', 'getDoc');
-    Route::post('documento', 'createDoc');
+Route::controller(FacturaController::class)->group(function () {
+    Route::get(    'facturas',        'getFacturas');
+    Route::get(    'factura/{id}',    'getFacturaById');
+    Route::get(    'factura/send-mail/{id}','enviarMail');
+    Route::post(   'factura',         'createFactura');
+    Route::patch(  'factura/{id}',    'updateFactura');
+    Route::delete( 'factura/{id}',    'deleteFactura');
 });
+    Route::controller(PacienteController::class)->group(function () {
+        Route::get('paciente','getPacientes');
+        Route::post('paciente', 'createPaciente');
+        Route::get('/paciente/{id}','getPacienteById');
+        Route::patch('/paciente/{id}','updatePaciente');
+        Route::delete('/paciente/{id}','deletePaciente');
+    });
