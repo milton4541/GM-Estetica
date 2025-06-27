@@ -77,7 +77,11 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::get('reportes/ingresos-totales', 'ingresosTotales');
     Route::get('reportes/ingresos-mensuales', 'ingresosPorMes');
     Route::get('reportes/rendimiento-tratamientos', 'rendimientoPorTratamiento');
-});
+    });
+
+    Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
+    Route::post('logout', 'logout');
+    });
 });
 Route::controller(DocumentoController::class)->group(function(){
     Route::get('documento', 'getDoc');

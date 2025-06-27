@@ -29,4 +29,5 @@ class Turno extends Model
     {
         return $this->belongsTo(Paciente::class, 'id_paciente', 'id_paciente');
     }
+    
 }

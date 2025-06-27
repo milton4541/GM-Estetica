@@ -32,6 +32,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
+use App\Http\Schedule
 
 class Kernel extends HttpKernel
 {
@@ -74,5 +75,14 @@ class Kernel extends HttpKernel
         'role' => RoleMiddleware::class,
         'permission' => PermissionMiddleware::class,
     ];
+
+protected function schedule(Schedule $schedule)
+{
+    $schedule->command('enviar:recordatorio-whatsapp')->dailyAt('20:00')
+        ->then(function () {
+            exec('python C:\laragon\www\GM-Estetica\python_scripts\enviar_whatsapp.py');
+        });
+}
+
 }
 
