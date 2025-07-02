@@ -15,7 +15,47 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    // Registrar usuario
+    /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     summary="Registrar un nuevo usuario",
+     *     tags={"Autenticación"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nombre", "apellido", "nombre_usuario", "email", "password", "password_confirmation"},
+     *             @OA\Property(property="nombre", type="string", example="Juan"),
+     *             @OA\Property(property="apellido", type="string", example="Pérez"),
+     *             @OA\Property(property="nombre_usuario", type="string", example="juan123"),
+     *             @OA\Property(property="id_rol", type="integer", nullable=true, example=2),
+     *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Usuario registrado exitosamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Usuario registrado exitosamente"),
+     *             @OA\Property(property="user", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="nombre", type="string", example="Juan"),
+     *                 @OA\Property(property="apellido", type="string", example="Pérez"),
+     *                 @OA\Property(property="nombre_usuario", type="string", example="juan123"),
+     *                 @OA\Property(property="id_rol", type="integer", example=2),
+     *                 @OA\Property(property="email", type="string", example="juan@example.com"),
+     *                 @OA\Property(property="created_at", type="string", example="2025-07-02T12:00:00.000000Z"),
+     *                 @OA\Property(property="updated_at", type="string", example="2025-07-02T12:00:00.000000Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación"
+     *     )
+     * )
+     */
 public function register(Request $request)
 {
     $validated = $request->validate([
@@ -43,6 +83,52 @@ public function register(Request $request)
     ], 201);
 }
     // Login de usuario
+    /**
+ * @OA\Post(
+ *     path="/api/login",
+ *     summary="Iniciar sesión y obtener token JWT",
+ *     tags={"Autenticación"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"nombre_usuario", "password"},
+ *             @OA\Property(property="nombre_usuario", type="string", example="juan123"),
+ *             @OA\Property(property="password", type="string", format="password", example="password123")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Inicio de sesión exitoso",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1QiLCJh..."),
+ *             @OA\Property(property="token_type", type="string", example="bearer"),
+ *             @OA\Property(property="expires_in", type="integer", example=3600),
+ *             @OA\Property(property="user", type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="nombre", type="string", example="Juan"),
+ *                 @OA\Property(property="apellido", type="string", example="Pérez"),
+ *                 @OA\Property(property="email", type="string", example="juan@example.com"),
+ *                 @OA\Property(property="nombre_usuario", type="string", example="juan123"),
+ *                 @OA\Property(property="id_rol", type="integer", example=2),
+ *                 @OA\Property(property="created_at", type="string", example="2025-07-01T12:00:00.000000Z"),
+ *                 @OA\Property(property="updated_at", type="string", example="2025-07-01T12:00:00.000000Z")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Credenciales inválidas"
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Error de validación"
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Error al crear el token"
+ *     )
+ * )
+ */
     public function login(Request $request)
 {
     $validator = Validator::make($request->all(), [
@@ -71,11 +157,56 @@ public function register(Request $request)
         'user' => auth('api')->user(),
     ]);
 }
+/**
+ * @OA\Get(
+ *     path="/api/user",
+ *     summary="Obtener el usuario autenticado",
+ *     tags={"Autenticación"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Usuario autenticado",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="id", type="integer", example=1),
+ *             @OA\Property(property="nombre", type="string", example="Juan"),
+ *             @OA\Property(property="apellido", type="string", example="Pérez"),
+ *             @OA\Property(property="email", type="string", example="juan@example.com"),
+ *             @OA\Property(property="nombre_usuario", type="string", example="juan123"),
+ *             @OA\Property(property="id_rol", type="integer", example=2),
+ *             @OA\Property(property="created_at", type="string", example="2025-07-01T12:00:00.000000Z"),
+ *             @OA\Property(property="updated_at", type="string", example="2025-07-01T12:00:00.000000Z")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Token no válido o no proporcionado"
+ *     )
+ * )
+ */
     public function getUser()
     {
         $user = Auth::user();
         return response()->json($user,200);
     }
+/**
+ * @OA\Post(
+ *     path="/api/logout",
+ *     summary="Cerrar sesión (invalidar token JWT)",
+ *     tags={"Autenticación"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Sesión cerrada correctamente",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Sesión cerrada correctamente")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Token no válido o ya invalidado"
+ *     )
+ * )
+ */
 
     public function logout(){
         JWTAuth::invalidate(JWTAuth::getToken());

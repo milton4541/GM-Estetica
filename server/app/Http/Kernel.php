@@ -32,7 +32,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
-use App\Http\Schedule
+use App\Http\Schedule;
 
 class Kernel extends HttpKernel
 {

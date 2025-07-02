@@ -81,9 +81,10 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
     Route::post('logout', 'logout');
+    Route::get('user','getUser');
     });
-});
-Route::controller(DocumentoController::class)->group(function(){
-    Route::get('documento', 'getDoc');
-    Route::post('documento', 'createDoc');
+    Route::controller(DocumentoController::class)->group(function(){
+        Route::get('documento', 'getDoc');
+        Route::post('documento', 'createDoc');
+    });
 });
