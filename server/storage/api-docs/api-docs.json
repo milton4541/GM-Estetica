@@ -327,12 +327,480 @@
                     }
                 ]
             }
+        },
+        "/api/pacientes": {
+            "get": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Obtener todos los pacientes",
+                "operationId": "e1d4a95b6937d8617162ca37106bf44f",
+                "responses": {
+                    "200": {
+                        "description": "Pacientes encontrados correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pacientes encontrados correctamente"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Paciente"
+                                            }
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron tratamientos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No se encontraron tratamientos"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Crear un nuevo paciente",
+                "operationId": "5b73129543cb236aecc91c2664b22796",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "dni_paciente",
+                                    "nombre",
+                                    "apellido",
+                                    "email",
+                                    "telefono",
+                                    "obra_social"
+                                ],
+                                "properties": {
+                                    "dni_paciente": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    },
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Laura"
+                                    },
+                                    "apellido": {
+                                        "type": "string",
+                                        "example": "Gómez"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "laura@example.com"
+                                    },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "+54 911 1234 5678"
+                                    },
+                                    "obra_social": {
+                                        "type": "string",
+                                        "example": "OSDE"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Paciente creado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paciente creado correctamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Paciente"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error en la validación de datos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en la validación de datos"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pacientes/{id}": {
+            "get": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Obtener un paciente por ID",
+                "operationId": "d1e89b85626acca6d4ba7c10102b66a5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del paciente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paciente encontrado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paciente encontrado correctamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Paciente"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Paciente no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paciente no encontrado"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Actualizar un paciente existente",
+                "operationId": "366e3138c68c3c41adea4e9f00c4a666",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del paciente a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "dni_paciente": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    },
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Laura"
+                                    },
+                                    "apellido": {
+                                        "type": "string",
+                                        "example": "Gómez"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "laura@example.com"
+                                    },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "+54 911 1234 5678"
+                                    },
+                                    "obra_social": {
+                                        "type": "string",
+                                        "example": "OSDE"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Paciente actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paciente actualizado correctamente"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Paciente"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Paciente no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paciente no encontrado"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en la validación de datos"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Pacientes"
+                ],
+                "summary": "Eliminar un paciente por ID",
+                "operationId": "372ebbc9fac5bff5a2d3291dff47327a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del paciente a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paciente eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paciente eliminado exitosamente"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Paciente no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Paciente no encontrado"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Paciente": {
+                "required": [
+                    "dni_paciente",
+                    "nombre",
+                    "apellido",
+                    "email",
+                    "telefono",
+                    "obra_social"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "dni_paciente": {
+                        "type": "string",
+                        "example": "12345678"
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Laura"
+                    },
+                    "apellido": {
+                        "type": "string",
+                        "example": "Gómez"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "laura@example.com"
+                    },
+                    "telefono": {
+                        "type": "string",
+                        "example": "+54 911 1234 5678"
+                    },
+                    "obra_social": {
+                        "type": "string",
+                        "example": "OSDE"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-01T12:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-01T12:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            }
         }
     },
     "tags": [
         {
             "name": "Autenticación",
             "description": "Autenticación"
+        },
+        {
+            "name": "Pacientes",
+            "description": "Pacientes"
         }
     ]
 }
