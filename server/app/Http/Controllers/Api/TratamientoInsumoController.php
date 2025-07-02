@@ -7,8 +7,29 @@ use Illuminate\Http\Request;
 use App\Models\TratamientoInsumo;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * @OA\Tag(
+ *     name="TratamientoInsumo",
+ *     description="Relaciones entre tratamientos e insumos"
+ * )
+ */
 class TratamientoInsumoController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/tratamiento-insumo",
+     *     summary="Obtener todas las relaciones tratamiento-insumo",
+     *     tags={"TratamientoInsumo"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Relaciones encontradas correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No se encontraron relaciones"
+     *     )
+     * )
+     */
     public function getRelaciones()
     {
         $relaciones = TratamientoInsumo::all();
@@ -27,6 +48,29 @@ class TratamientoInsumoController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/tratamiento-insumo",
+     *     summary="Crear una relación tratamiento-insumo",
+     *     tags={"TratamientoInsumo"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"id_tratamiento","id_insumo"},
+     *             @OA\Property(property="id_tratamiento", type="integer", example=1),
+     *             @OA\Property(property="id_insumo", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Relación creada correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error en la validación de datos"
+     *     )
+     * )
+     */
     public function createRelacion(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -56,6 +100,28 @@ class TratamientoInsumoController extends Controller
         ], 201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/tratamiento-insumo/{id}",
+     *     summary="Obtener una relación tratamiento-insumo por ID",
+     *     tags={"TratamientoInsumo"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la relación",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Relación encontrada correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Relación no encontrada"
+     *     )
+     * )
+     */
     public function getRelacionById($id)
     {
         $relacion = TratamientoInsumo::find($id);
@@ -74,6 +140,39 @@ class TratamientoInsumoController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/tratamiento-insumo/{id}",
+     *     summary="Actualizar una relación tratamiento-insumo",
+     *     tags={"TratamientoInsumo"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la relación a actualizar",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id_tratamiento", type="integer", example=1),
+     *             @OA\Property(property="id_insumo", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Relación actualizada correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Relación no encontrada"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error en la validación de datos"
+     *     )
+     * )
+     */
     public function updateRelacion(Request $request, $id)
     {
         $relacion = TratamientoInsumo::find($id);
@@ -116,6 +215,28 @@ class TratamientoInsumoController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/tratamiento-insumo/{id}",
+     *     summary="Eliminar una relación tratamiento-insumo por ID",
+     *     tags={"TratamientoInsumo"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la relación a eliminar",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Relación eliminada correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Relación no encontrada"
+     *     )
+     * )
+     */
     public function deleteRelacion($id)
     {
         $relacion = TratamientoInsumo::find($id);

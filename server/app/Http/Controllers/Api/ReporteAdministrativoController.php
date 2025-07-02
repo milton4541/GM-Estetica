@@ -9,9 +9,26 @@ use App\Models\Tratamiento;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+/**
+ * @OA\Tag(
+ *     name="Reportes administrativos",
+ *     description="Reportes e indicadores financieros del sistema"
+ * )
+ */
 class ReporteAdministrativoController extends Controller
 {
-    // 1. Ingresos totales del sistema
+    /**
+     * @OA\Get(
+     *     path="/api/reportes/ingresos-totales",
+     *     summary="Obtener el total de ingresos del sistema",
+     *     tags={"Reportes administrativos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ingresos totales calculados correctamente"
+     *     )
+     * )
+     */
     public function ingresosTotales()
     {
         $total = Factura::sum('importe_final');
@@ -23,7 +40,18 @@ class ReporteAdministrativoController extends Controller
         ], 200);
     }
 
-    // 2. Ingresos por mes
+    /**
+     * @OA\Get(
+     *     path="/api/reportes/ingresos-mensuales",
+     *     summary="Obtener ingresos totales agrupados por mes",
+     *     tags={"Reportes administrativos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ingresos mensuales obtenidos correctamente"
+     *     )
+     * )
+     */
     public function ingresosPorMes()
     {
         $ingresos = Factura::selectRaw("strftime('%Y-%m', created_at) as mes, sum(importe_final) as total")
@@ -38,7 +66,18 @@ class ReporteAdministrativoController extends Controller
         ], 200);
     }
 
-    // 3. Rendimiento por tratamiento
+    /**
+     * @OA\Get(
+     *     path="/api/reportes/rendimiento-tratamientos",
+     *     summary="Obtener ingresos generados por cada tratamiento",
+     *     tags={"Reportes administrativos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Rendimiento por tratamiento generado correctamente"
+     *     )
+     * )
+     */
     public function rendimientoPorTratamiento()
     {
         $rendimiento = DB::table('factura')

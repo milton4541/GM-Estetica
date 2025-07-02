@@ -1,14 +1,33 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
 use App\Models\Factura;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Validator;
 
+/**
+ * @OA\Tag(
+ *     name="Facturas",
+ *     description="Operaciones sobre facturas"
+ * )
+ */
 class FacturaController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/facturas",
+     *     summary="Obtener todas las facturas",
+     *     tags={"Facturas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Listado de facturas obtenido exitosamente"
+     *     )
+     * )
+     */
     public function getFacturas(): JsonResponse
     {
         $facturas = Factura::with(['paciente', 'pagos'])->get();
@@ -20,6 +39,34 @@ class FacturaController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/facturas",
+     *     summary="Crear una nueva factura",
+     *     tags={"Facturas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"importe", "importe_final", "id_paciente", "id_tratamiento"},
+     *             @OA\Property(property="importe", type="number", example=1000),
+     *             @OA\Property(property="descuento_precio", type="number", example=100, nullable=true),
+     *             @OA\Property(property="descuento_porcentaje", type="number", example=10, nullable=true),
+     *             @OA\Property(property="importe_final", type="number", example=900),
+     *             @OA\Property(property="id_paciente", type="integer", example=1),
+     *             @OA\Property(property="id_tratamiento", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Factura creada correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error en la validación de datos"
+     *     )
+     * )
+     */
     public function createFactura(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -29,29 +76,6 @@ class FacturaController extends Controller
             'importe_final'         => 'required|numeric|min:0',
             'id_paciente'           => 'required|integer|exists:pacientes,id_paciente',
             'id_tratamiento'        => 'required|integer|exists:tratamientos,id_tratamiento',
-        ], [
-            'importe.required'              => 'El importe es obligatorio.',
-            'importe.numeric'               => 'El importe debe ser un número.',
-            'importe.min'                   => 'El importe no puede ser negativo.',
-
-            'descuento_precio.numeric'      => 'El descuento en precio debe ser un número.',
-            'descuento_precio.min'          => 'El descuento en precio no puede ser negativo.',
-
-            'descuento_porcentaje.numeric'  => 'El descuento porcentual debe ser un número.',
-            'descuento_porcentaje.min'      => 'El descuento porcentual no puede ser negativo.',
-            'descuento_porcentaje.max'      => 'El descuento porcentual no puede superar 100.',
-
-            'importe_final.required'        => 'El importe final es obligatorio.',
-            'importe_final.numeric'         => 'El importe final debe ser un número.',
-            'importe_final.min'             => 'El importe final no puede ser negativo.',
-
-            'id_paciente.required'          => 'El ID de paciente es obligatorio.',
-            'id_paciente.integer'           => 'El ID de paciente debe ser un entero.',
-            'id_paciente.exists'            => 'El paciente no existe.',
-
-            'id_tratamiento.required'       => 'El ID de tratamiento es obligatorio.',
-            'id_tratamiento.integer'        => 'El ID de tratamiento debe ser un entero.',
-            'id_tratamiento.exists'         => 'El tratamiento no existe.',
         ]);
 
         if ($validator->fails()) {
@@ -71,6 +95,44 @@ class FacturaController extends Controller
         ], 201);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/facturas/{id}",
+     *     summary="Actualizar una factura existente",
+     *     tags={"Facturas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la factura",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="importe", type="number", example=1000),
+     *             @OA\Property(property="descuento_precio", type="number", example=100, nullable=true),
+     *             @OA\Property(property="descuento_porcentaje", type="number", example=10, nullable=true),
+     *             @OA\Property(property="importe_final", type="number", example=900),
+     *             @OA\Property(property="id_paciente", type="integer", example=1),
+     *             @OA\Property(property="id_tratamiento", type="integer", example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Factura actualizada correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Factura no encontrada"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error en la validación de datos"
+     *     )
+     * )
+     */
     public function updateFactura(Request $request, $id): JsonResponse
     {
         $factura = Factura::find($id);
@@ -81,40 +143,15 @@ class FacturaController extends Controller
             ], 404);
         }
 
-        $rules = [
+        $validator = Validator::make($request->all(), [
             'importe'              => 'sometimes|required|numeric|min:0',
             'descuento_precio'     => 'sometimes|nullable|numeric|min:0',
             'descuento_porcentaje' => 'sometimes|nullable|numeric|min:0|max:100',
             'importe_final'        => 'sometimes|required|numeric|min:0',
             'id_paciente'          => 'sometimes|required|integer|exists:pacientes,id_paciente',
             'id_tratamiento'       => 'sometimes|required|integer|exists:tratamientos,id_tratamiento',
-        ];
-        $messages = [
-            'importe.required'              => 'El importe es obligatorio.',
-            'importe.numeric'               => 'El importe debe ser un número.',
-            'importe.min'                   => 'El importe no puede ser negativo.',
+        ]);
 
-            'descuento_precio.numeric'      => 'El descuento en precio debe ser un número.',
-            'descuento_precio.min'          => 'El descuento en precio no puede ser negativo.',
-
-            'descuento_porcentaje.numeric'  => 'El descuento porcentual debe ser un número.',
-            'descuento_porcentaje.min'      => 'El descuento porcentual no puede ser negativo.',
-            'descuento_porcentaje.max'      => 'El descuento porcentual no puede superar 100.',
-
-            'importe_final.required'        => 'El importe final es obligatorio.',
-            'importe_final.numeric'         => 'El importe final debe ser un número.',
-            'importe_final.min'             => 'El importe final no puede ser negativo.',
-
-            'id_paciente.required'          => 'El ID de paciente es obligatorio.',
-            'id_paciente.integer'           => 'El ID de paciente debe ser un entero.',
-            'id_paciente.exists'            => 'El paciente no existe.',
-
-            'id_tratamiento.required'       => 'El ID de tratamiento es obligatorio.',
-            'id_tratamiento.integer'        => 'El ID de tratamiento debe ser un entero.',
-            'id_tratamiento.exists'         => 'El tratamiento no existe.',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -131,9 +168,33 @@ class FacturaController extends Controller
             'message' => 'Pago actualizado correctamente',
         ], 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/facturas/{id}",
+     *     summary="Obtener una factura por ID",
+     *     tags={"Facturas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la factura",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Factura obtenida exitosamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Factura no encontrada"
+     *     )
+     * )
+     */
     public function getFacturaById($id): JsonResponse
     {
-            $factura = Factura::with(['paciente', 'pagos'])->find($id);
+        $factura = Factura::with(['paciente', 'pagos'])->find($id);
 
         if (! $factura) {
             return response()->json([
@@ -148,6 +209,30 @@ class FacturaController extends Controller
             'message' => 'Factura obtenida exitosamente'
         ], 200);
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/facturas/{id}",
+     *     summary="Eliminar una factura",
+     *     tags={"Facturas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la factura",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Factura eliminada correctamente"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Factura no encontrada"
+     *     )
+     * )
+     */
     public function deleteFactura($id): JsonResponse
     {
         $factura = Factura::find($id);
@@ -165,5 +250,4 @@ class FacturaController extends Controller
             'message' => 'Factura eliminada correctamente'
         ], 200);
     }
-
 }
