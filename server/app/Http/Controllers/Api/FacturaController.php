@@ -13,7 +13,43 @@ use Validator;
  *     name="Facturas",
  *     description="Operaciones sobre facturas"
  * )
+ * 
+ * @OA\Schema(
+ *     schema="Factura",
+ *     type="object",
+ *     title="Factura",
+ *     required={"id_factura", "importe", "importe_final", "id_paciente", "id_tratamiento"},
+ *     @OA\Property(property="id_factura", type="integer", example=1),
+ *     @OA\Property(property="importe", type="number", format="float", example=1000),
+ *     @OA\Property(property="descuento_precio", type="number", format="float", example=100, nullable=true),
+ *     @OA\Property(property="descuento_porcentaje", type="number", format="float", example=10, nullable=true),
+ *     @OA\Property(property="importe_final", type="number", format="float", example=900),
+ *     @OA\Property(property="id_paciente", type="integer", example=1),
+ *     @OA\Property(property="id_tratamiento", type="integer", example=2),
+ * 
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ResponseFactura",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="data", ref="#/components/schemas/Factura"),
+ *     @OA\Property(property="message", type="string", example="Operación realizada correctamente")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ResponseFacturaList",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/Factura")
+ *     ),
+ *     @OA\Property(property="message", type="string", example="Listado de facturas obtenido exitosamente")
+ * )
  */
+
 class FacturaController extends Controller
 {
     /**
@@ -24,7 +60,8 @@ class FacturaController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Listado de facturas obtenido exitosamente"
+     *         description="Listado de facturas obtenido exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseFacturaList")
      *     )
      * )
      */
@@ -59,7 +96,8 @@ class FacturaController extends Controller
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Factura creada correctamente"
+     *         description="Factura creada correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseFactura")
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -121,7 +159,8 @@ class FacturaController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Factura actualizada correctamente"
+     *         description="Factura actualizada correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseFactura")
      *     ),
      *     @OA\Response(
      *         response=404,
@@ -184,7 +223,8 @@ class FacturaController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Factura obtenida exitosamente"
+     *         description="Factura obtenida exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseFactura")
      *     ),
      *     @OA\Response(
      *         response=404,

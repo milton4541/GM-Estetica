@@ -79,6 +79,12 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::get('reportes/rendimiento-tratamientos', 'rendimientoPorTratamiento');
     });
 
+    Route::get('/jwt-check', function () {
+    return response()->json([
+        'env' => env('JWT_SECRET'),
+        'config' => config('jwt.secret')
+    ]);
+});
     Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
     Route::post('logout', 'logout');
     Route::get('user','getUser');

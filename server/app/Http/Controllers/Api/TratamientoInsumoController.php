@@ -8,6 +8,18 @@ use App\Models\TratamientoInsumo;
 use Illuminate\Support\Facades\Validator;
 
 /**
+ * @OA\Schema(
+ *     schema="TratamientoInsumo",
+ *     type="object",
+ *     title="TratamientoInsumo",
+ *     required={"id", "id_tratamiento", "id_insumo"},
+ *     @OA\Property(property="id", type="integer", example=1, description="ID de la relación"),
+ *     @OA\Property(property="id_tratamiento", type="integer", example=1, description="ID del tratamiento"),
+ *     @OA\Property(property="id_insumo", type="integer", example=2, description="ID del insumo"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T15:00:00Z", description="Fecha de creación"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T15:00:00Z", description="Fecha de actualización")
+ * )
+ *
  * @OA\Tag(
  *     name="TratamientoInsumo",
  *     description="Relaciones entre tratamientos e insumos"
@@ -22,7 +34,8 @@ class TratamientoInsumoController extends Controller
      *     tags={"TratamientoInsumo"},
      *     @OA\Response(
      *         response=200,
-     *         description="Relaciones encontradas correctamente"
+     *         description="Relaciones encontradas correctamente",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/TratamientoInsumo"))
      *     ),
      *     @OA\Response(
      *         response=404,
@@ -63,7 +76,8 @@ class TratamientoInsumoController extends Controller
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Relación creada correctamente"
+     *         description="Relación creada correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/TratamientoInsumo")
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -114,7 +128,8 @@ class TratamientoInsumoController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Relación encontrada correctamente"
+     *         description="Relación encontrada correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/TratamientoInsumo")
      *     ),
      *     @OA\Response(
      *         response=404,
@@ -161,7 +176,8 @@ class TratamientoInsumoController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Relación actualizada correctamente"
+     *         description="Relación actualizada correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/TratamientoInsumo")
      *     ),
      *     @OA\Response(
      *         response=404,

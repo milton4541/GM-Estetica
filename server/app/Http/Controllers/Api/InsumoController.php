@@ -6,12 +6,48 @@ use App\Http\Controllers\Controller;
 use App\Models\Insumo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Validator;
 
 /**
  * @OA\Tag(
  *     name="Insumos",
  *     description="Operaciones sobre insumos médicos"
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="Insumo",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="componentes", type="string", example="Ácido hialurónico"),
+ *     @OA\Property(property="precio_insumo", type="number", example=4500.50),
+ *     @OA\Property(property="cantidad", type="integer", example=10),
+ *     @OA\Property(property="cantidad_min", type="integer", example=5),
+ *     @OA\Property(property="nombre", type="string", example="Insumo facial A"),
+ *     @OA\Property(property="fecha_expiracion", type="string", example="2025-12-31"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T12:00:00Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T12:00:00Z"),
+ *     @OA\Property(property="alertaBajoStock", type="boolean", example=false)
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ResponseInsumoList",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Insumos encontrados correctamente"),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/Insumo")
+ *     )
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ResponseInsumoSingle",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Insumo encontrado correctamente"),
+ *     @OA\Property(property="data", ref="#/components/schemas/Insumo")
  * )
  */
 class InsumoController extends Controller
@@ -24,33 +60,39 @@ class InsumoController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Listado de insumos encontrado correctamente"
+     *         description="Listado de insumos encontrado correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseInsumoList")
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="No se encontraron tratamientos"
+     *         description="No se encontraron tratamientos",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No se encontraron tratamientos")
+     *         )
      *     )
      * )
      */
-    public function getInsumos(Request $request){
+    public function getInsumos(Request $request): JsonResponse
+    {
         $insumo = Insumo::all();
-        if($insumo->isEmpty()){
+        if ($insumo->isEmpty()) {
             return response()->json([
-                'message'=>'No se encontraron tratamientos',
+                'message' => 'No se encontraron tratamientos',
                 'success' => false,
-            ],404);
+            ], 404);
         }
 
-        $insumosConAlerta = $insumo->map(function($insumo){
+        $insumosConAlerta = $insumo->map(function ($insumo) {
             $insumo->alertaBajoStock = ($insumo->cantidad <= $insumo->cantidad_min);
             return $insumo;
         });
 
         return response()->json([
-            'message'=> 'Insumos encontrados correctamente',
-            'data' => $insumo,
+            'message' => 'Insumos encontrados correctamente',
+            'data' => $insumosConAlerta,
             'success' => true,
-        ],200);
+        ], 200);
     }
 
     /**
@@ -72,15 +114,22 @@ class InsumoController extends Controller
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Insumo creado correctamente"
+     *         description="Insumo creado correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseInsumoSingle")
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Error en la validación de datos"
+     *         description="Error en la validación de datos",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error en la validación de datos"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
      *     )
      * )
      */
-    public function createInsumo(Request $request){
+    public function createInsumo(Request $request): JsonResponse
+    {
         $validator = Validator::make($request->all(), [
             'componentes'      => 'required|string',
             'precio_insumo'    => 'required|numeric|min:0',
@@ -123,21 +172,27 @@ class InsumoController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Insumo encontrado correctamente"
+     *         description="Insumo encontrado correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseInsumoSingle")
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Insumo no encontrado"
+     *         description="Insumo no encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Insumo no encontrado")
+     *         )
      *     )
      * )
      */
-    public function getInsumoById(Request $request, $id){
+    public function getInsumoById(Request $request, $id): JsonResponse
+    {
         $insumo = Insumo::find($id);
-        if(!$insumo){
-            return response()->json(['message' => 'Insumo no encontrado','success' => 'false'],404);
+        if (!$insumo) {
+            return response()->json(['message' => 'Insumo no encontrado', 'success' => false], 404);
         }
         return response()->json([
-            'message'  => 'Insumo encontrado correctamente',
+            'message' => 'Insumo encontrado correctamente',
             'data' => $insumo,
             'success' => true,
         ], 200);
@@ -168,21 +223,32 @@ class InsumoController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Insumo actualizado correctamente"
+     *         description="Insumo actualizado correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/ResponseInsumoSingle")
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Insumo no encontrado"
+     *         description="Insumo no encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Insumo no encontrado")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Error en la validación de datos"
+     *         description="Error en la validación de datos",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error en la validación de datos"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
      *     )
      * )
      */
-    public function updateInsumo(Request $request, $id){
+    public function updateInsumo(Request $request, $id): JsonResponse
+    {
         $insumo = Insumo::find($id);
-        if (! $insumo) {
+        if (!$insumo) {
             return response()->json([
                 'success' => false,
                 'message' => 'Insumo no encontrado'
@@ -234,25 +300,34 @@ class InsumoController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Insumo eliminado correctamente"
+     *         description="Insumo eliminado correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Insumo eliminado correctamente")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Insumo no encontrado"
+     *         description="Insumo no encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Insumo no encontrado")
+     *         )
      *     )
      * )
      */
-    public function deleteInsumo(Request $request, $id){
+    public function deleteInsumo(Request $request, $id): JsonResponse
+    {
         $insumo = Insumo::find($id);
 
-        if(!$insumo){
-            return response()->json(['message' => 'Insumo no encontrado', 'success' => 'false'], 404);
+        if (!$insumo) {
+            return response()->json(['message' => 'Insumo no encontrado', 'success' => false], 404);
         }
 
         $insumo->delete();
         return response()->json([
-            'success'=> true,
-            'message' => 'Insumo elminado correctamente',
-        ],200);
+            'success' => true,
+            'message' => 'Insumo eliminado correctamente',
+        ], 200);
     }
 }

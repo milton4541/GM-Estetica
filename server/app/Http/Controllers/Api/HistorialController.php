@@ -26,7 +26,7 @@ class HistorialController extends Controller
      *         description="Listado de historiales",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="succes", type="boolean", example=true),
+     *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="data", type="array",
      *                 @OA\Items(
      *                     @OA\Property(property="id", type="integer", example=1),
@@ -52,7 +52,7 @@ class HistorialController extends Controller
         $historiales = Historial::with(['paciente', 'tratamiento'])->get();
 
         return response()->json([
-            'succes' => true,
+            'success' => true,
             'data' => $historiales
         ], 200);
     }

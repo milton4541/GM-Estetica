@@ -14,6 +14,52 @@ use Carbon\Carbon;
  *     name="Reportes administrativos",
  *     description="Reportes e indicadores financieros del sistema"
  * )
+ * 
+ * @OA\Schema(
+ *     schema="IngresoTotalResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Ingresos totales calculados correctamente"),
+ *     @OA\Property(property="total", type="number", format="float", example=150000.75),
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="IngresoPorMesItem",
+ *     type="object",
+ *     @OA\Property(property="mes", type="string", example="2025-07"),
+ *     @OA\Property(property="total", type="number", format="float", example=25000.00),
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="IngresoPorMesResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Ingresos mensuales obtenidos correctamente"),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/IngresoPorMesItem")
+ *     )
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="RendimientoTratamientoItem",
+ *     type="object",
+ *     @OA\Property(property="tratamiento", type="string", example="Limpieza facial"),
+ *     @OA\Property(property="ingreso_total", type="number", format="float", example=50000.00),
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="RendimientoTratamientoResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Rendimiento por tratamiento generado correctamente"),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/RendimientoTratamientoItem")
+ *     )
+ * )
  */
 class ReporteAdministrativoController extends Controller
 {
@@ -25,7 +71,8 @@ class ReporteAdministrativoController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Ingresos totales calculados correctamente"
+     *         description="Ingresos totales calculados correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/IngresoTotalResponse")
      *     )
      * )
      */
@@ -48,7 +95,8 @@ class ReporteAdministrativoController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Ingresos mensuales obtenidos correctamente"
+     *         description="Ingresos mensuales obtenidos correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/IngresoPorMesResponse")
      *     )
      * )
      */
@@ -74,7 +122,8 @@ class ReporteAdministrativoController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Rendimiento por tratamiento generado correctamente"
+     *         description="Rendimiento por tratamiento generado correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/RendimientoTratamientoResponse")
      *     )
      * )
      */

@@ -147,7 +147,10 @@ public function register(Request $request)
             return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
     } catch (JWTException $e) {
-        return response()->json(['error' => 'No se pudo crear el token'], 500);
+       return response()->json([
+        'error' => 'No se pudo crear el token',
+        'message' => $e->getMessage(),
+],       500);
     }
 
     return response()->json([

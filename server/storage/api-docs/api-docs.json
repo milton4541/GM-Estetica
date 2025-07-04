@@ -571,7 +571,14 @@
                 "operationId": "b7c77273eb8a07dbf9e7f842b86c85f7",
                 "responses": {
                     "200": {
-                        "description": "Listado de facturas obtenido exitosamente"
+                        "description": "Listado de facturas obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseFacturaList"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -632,7 +639,14 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Factura creada correctamente"
+                        "description": "Factura creada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseFactura"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Error en la validación de datos"
@@ -666,7 +680,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Factura obtenida exitosamente"
+                        "description": "Factura obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseFactura"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Factura no encontrada"
@@ -736,7 +757,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Factura actualizada correctamente"
+                        "description": "Factura actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseFactura"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Factura no encontrada"
@@ -798,7 +826,7 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "succes": {
+                                        "success": {
                                             "type": "boolean",
                                             "example": true
                                         },
@@ -875,10 +903,34 @@
                 "operationId": "e7e959436667829a4acb2b85f7999905",
                 "responses": {
                     "200": {
-                        "description": "Listado de insumos encontrado correctamente"
+                        "description": "Listado de insumos encontrado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseInsumoList"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "No se encontraron tratamientos"
+                        "description": "No se encontraron tratamientos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No se encontraron tratamientos"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -934,10 +986,37 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Insumo creado correctamente"
+                        "description": "Insumo creado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseInsumoSingle"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Error en la validación de datos"
+                        "description": "Error en la validación de datos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en la validación de datos"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -968,10 +1047,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Insumo encontrado correctamente"
+                        "description": "Insumo encontrado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseInsumoSingle"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Insumo no encontrado"
+                        "description": "Insumo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Insumo no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1032,13 +1135,57 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Insumo actualizado correctamente"
+                        "description": "Insumo actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseInsumoSingle"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Insumo no encontrado"
+                        "description": "Insumo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Insumo no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Error en la validación de datos"
+                        "description": "Error en la validación de datos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en la validación de datos"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1067,10 +1214,44 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Insumo eliminado correctamente"
+                        "description": "Insumo eliminado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Insumo eliminado correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Insumo no encontrado"
+                        "description": "Insumo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Insumo no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1497,7 +1678,14 @@
                 "operationId": "c7b0c662d9a7ba73f33c5869f72747e6",
                 "responses": {
                     "200": {
-                        "description": "Ingresos totales calculados correctamente"
+                        "description": "Ingresos totales calculados correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngresoTotalResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1516,7 +1704,14 @@
                 "operationId": "e75dbf9d9717f599c4b3524e12d5738b",
                 "responses": {
                     "200": {
-                        "description": "Ingresos mensuales obtenidos correctamente"
+                        "description": "Ingresos mensuales obtenidos correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/IngresoPorMesResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1535,7 +1730,14 @@
                 "operationId": "a29659a6df2c3d52bc14013f99905ce9",
                 "responses": {
                     "200": {
-                        "description": "Rendimiento por tratamiento generado correctamente"
+                        "description": "Rendimiento por tratamiento generado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RendimientoTratamientoResponse"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1554,12 +1756,41 @@
                 "operationId": "531c467fa1225b865227c3189bd19f5f",
                 "responses": {
                     "200": {
-                        "description": "Tratamientos encontrados correctamente"
+                        "description": "Tratamientos encontrados correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseTratamientoList"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "No se encontraron tratamientos"
+                        "description": "No se encontraron tratamientos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No se encontraron tratamientos"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -1604,12 +1835,31 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Tratamiento creado correctamente"
+                        "description": "Tratamiento creado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseTratamientoSingle"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Error en la validación de datos"
+                        "description": "Error en la validación de datos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidacion"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/tratamientos/{id}": {
@@ -1626,18 +1876,48 @@
                         "description": "ID del tratamiento",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Tratamiento encontrado correctamente"
+                        "description": "Tratamiento encontrado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseTratamientoSingle"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Tratamiento no encontrado"
+                        "description": "Tratamiento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tratamiento no encontrado"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "put": {
                 "tags": [
@@ -1652,7 +1932,8 @@
                         "description": "ID del tratamiento a actualizar",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
@@ -1687,15 +1968,51 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Tratamiento actualizado correctamente"
+                        "description": "Tratamiento actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseTratamientoSingle"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Tratamiento no encontrado"
+                        "description": "Tratamiento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tratamiento no encontrado"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Error en la validación de datos"
+                        "description": "Error en la validación de datos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorValidacion"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -1710,18 +2027,58 @@
                         "description": "ID del tratamiento a eliminar",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Tratamiento eliminado exitosamente"
+                        "description": "Tratamiento eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tratamiento eliminado exitosamente"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Tratamiento no encontrado"
+                        "description": "Tratamiento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tratamiento no encontrado"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/tratamiento-insumo": {
@@ -1733,7 +2090,17 @@
                 "operationId": "6842b004a6b4d249771affc5f240f6fd",
                 "responses": {
                     "200": {
-                        "description": "Relaciones encontradas correctamente"
+                        "description": "Relaciones encontradas correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/TratamientoInsumo"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "No se encontraron relaciones"
@@ -1772,7 +2139,14 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Relación creada correctamente"
+                        "description": "Relación creada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TratamientoInsumo"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Error en la validación de datos"
@@ -1800,7 +2174,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Relación encontrada correctamente"
+                        "description": "Relación encontrada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TratamientoInsumo"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Relación no encontrada"
@@ -1846,7 +2227,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Relación actualizada correctamente"
+                        "description": "Relación actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TratamientoInsumo"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Relación no encontrada"
@@ -2327,6 +2715,170 @@
     },
     "components": {
         "schemas": {
+            "Factura": {
+                "title": "Factura",
+                "required": [
+                    "id_factura",
+                    "importe",
+                    "importe_final",
+                    "id_paciente",
+                    "id_tratamiento"
+                ],
+                "properties": {
+                    "id_factura": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "importe": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1000
+                    },
+                    "descuento_precio": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 100,
+                        "nullable": true
+                    },
+                    "descuento_porcentaje": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 10,
+                        "nullable": true
+                    },
+                    "importe_final": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 900
+                    },
+                    "id_paciente": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_tratamiento": {
+                        "type": "integer",
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseFactura": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Factura"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Operación realizada correctamente"
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseFacturaList": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Factura"
+                        }
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Listado de facturas obtenido exitosamente"
+                    }
+                },
+                "type": "object"
+            },
+            "Insumo": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "componentes": {
+                        "type": "string",
+                        "example": "Ácido hialurónico"
+                    },
+                    "precio_insumo": {
+                        "type": "number",
+                        "example": 4500.5
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "cantidad_min": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Insumo facial A"
+                    },
+                    "fecha_expiracion": {
+                        "type": "string",
+                        "example": "2025-12-31"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T12:00:00Z"
+                    },
+                    "alertaBajoStock": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseInsumoList": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Insumos encontrados correctamente"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Insumo"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseInsumoSingle": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Insumo encontrado correctamente"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Insumo"
+                    }
+                },
+                "type": "object"
+            },
             "Paciente": {
                 "required": [
                     "dni_paciente",
@@ -2375,6 +2927,208 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-01T12:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "IngresoTotalResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Ingresos totales calculados correctamente"
+                    },
+                    "total": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 150000.75
+                    }
+                },
+                "type": "object"
+            },
+            "IngresoPorMesItem": {
+                "properties": {
+                    "mes": {
+                        "type": "string",
+                        "example": "2025-07"
+                    },
+                    "total": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 25000
+                    }
+                },
+                "type": "object"
+            },
+            "IngresoPorMesResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Ingresos mensuales obtenidos correctamente"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/IngresoPorMesItem"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "RendimientoTratamientoItem": {
+                "properties": {
+                    "tratamiento": {
+                        "type": "string",
+                        "example": "Limpieza facial"
+                    },
+                    "ingreso_total": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50000
+                    }
+                },
+                "type": "object"
+            },
+            "RendimientoTratamientoResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Rendimiento por tratamiento generado correctamente"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RendimientoTratamientoItem"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Tratamiento": {
+                "properties": {
+                    "id_tratamiento": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "descripcion": {
+                        "type": "string",
+                        "example": "Tratamiento facial"
+                    },
+                    "duracion": {
+                        "type": "integer",
+                        "example": 60
+                    },
+                    "precio": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1200.5
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorValidacion": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Error en la validación de datos"
+                    },
+                    "errors": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "property": null
+                        }
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseTratamientoList": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Tratamientos encontrados correctamente"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Tratamiento"
+                        }
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseTratamientoSingle": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Tratamiento encontrado correctamente"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Tratamiento"
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "TratamientoInsumo": {
+                "title": "TratamientoInsumo",
+                "required": [
+                    "id",
+                    "id_tratamiento",
+                    "id_insumo"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID de la relación",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_tratamiento": {
+                        "description": "ID del tratamiento",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "id_insumo": {
+                        "description": "ID del insumo",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "created_at": {
+                        "description": "Fecha de creación",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T15:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Fecha de actualización",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-04T15:00:00Z"
                     }
                 },
                 "type": "object"
