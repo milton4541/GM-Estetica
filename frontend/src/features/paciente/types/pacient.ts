@@ -7,4 +7,4 @@ export type Pacient = {
     obra_social: string
 }
 
-export type PacientWithId = Pacient & {id: number}
+export type PacientWithId = Pacient & {id_paciente: number}

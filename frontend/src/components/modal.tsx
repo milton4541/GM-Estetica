@@ -1,3 +1,4 @@
+import React from "react";
 type modalProps = {
     children: React.ReactNode;
     isOpen: boolean;
@@ -6,7 +7,6 @@ type modalProps = {
 
 const Modal: React.FC<modalProps> = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
-
 
     return (
         <div

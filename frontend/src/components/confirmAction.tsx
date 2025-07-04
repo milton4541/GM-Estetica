@@ -1,11 +1,10 @@
 interface ConfirmActionProps {
-    isOpen: boolean;
+
     onConfirm: () => void;
     onCancel: () => void;
 }
 
-const ConfirmAction = ({ isOpen, onConfirm, onCancel }: ConfirmActionProps) => {
-    if (!isOpen) return null;
+const ConfirmAction = ({ onConfirm, onCancel }: ConfirmActionProps) => {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

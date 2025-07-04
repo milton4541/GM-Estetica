@@ -22,11 +22,11 @@ Route::post('login',[AuthController::class,'login']);
 //rutas privadas (necesitas auth)
 Route::middleware([IsUserAuth::class])->group(function () {
     Route::controller(PacienteController::class)->group(function () {
-        Route::get('paciente','getPacientes');
-        Route::post('paciente', 'createPaciente');
-        Route::get('/paciente/{id}','getPacienteById');
-        Route::patch('/paciente/{id}','updatePaciente');
-        Route::delete('/paciente/{id}','deletePaciente');
+        Route::get('pacientes','getPacientes');
+        Route::post('pacientes', 'createPaciente');
+        Route::get('/pacientes/{id}','getPacienteById');
+        Route::patch('/pacientes/{id}','updatePaciente');
+        Route::delete('/pacientes/{id}','deletePaciente');
     });
 
     Route::controller(TratamientoController::class)->group(function () {
