@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tratamientos', function (Blueprint $table) {
             // PK autoincremental
-            $table->increments('id_tratamiento');
+            $table->id('id_tratamiento');
 
             // Descripción del tratamiento
             $table->string('descripcion');

@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\ReporteAdministrativoController;
 //rutas publicas
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
+Route::post('rol',[AuthController::class,'createRol']);
 
 //rutas privadas (necesitas auth)
 Route::middleware([IsUserAuth::class])->group(function () {
@@ -30,11 +31,11 @@ Route::middleware([IsUserAuth::class])->group(function () {
     });
 
     Route::controller(TratamientoController::class)->group(function () {
-        Route::get('tratamiento', 'getTratamientos');
-        Route::post('tratamiento','createTratamiento');
-        Route::get('/tratamiento/{id}','getTratamientoById');
-        Route::patch('/tratamiento/{id}','updateTratamiento');
-        Route::delete('/tratamiento/{id}','deleteTratamiento');
+        Route::get('tratamientos', 'getTratamientos');
+        Route::post('tratamientos','createTratamiento');
+        Route::get('/tratamientos/{id}','getTratamientoById');
+        Route::patch('/tratamientos/{id}','updateTratamiento');
+        Route::delete('/tratamientos/{id}','deleteTratamiento');
     });
     Route::controller(TurnoController::class)->group(function () {
         Route::get(   'turno',       'getTurnos'      );
@@ -88,9 +89,12 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
     Route::post('logout', 'logout');
     Route::get('user','getUser');
+    
     });
     Route::controller(DocumentoController::class)->group(function(){
         Route::get('documento', 'getDoc');
         Route::post('documento', 'createDoc');
     });
+    
+
 });

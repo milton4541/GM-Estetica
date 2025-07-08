@@ -5,6 +5,7 @@ import Layout from "./layout/layout";
 import Turno from "./features/turnos/Turno";
 import PrivateRoute from "./utils/PrivateRoute";
 import PacienteList from "./features/paciente/PacienteList";
+import InsumosList from "./features/insumo/InsumosList";
 export default function AppRouter() {
     return (
 <BrowserRouter>
@@ -12,7 +13,6 @@ export default function AppRouter() {
 
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/r" element={<PacienteList />} />
         {/* Rutas protegidas */}
         <Route
           element={
@@ -22,8 +22,9 @@ export default function AppRouter() {
           }
         >
           <Route path="/" element={<Turno />} />
-                  <Route path="/b" element={<PacienteList />} />
           <Route path="/pacientes" element={<PacienteList />} />
+          <Route path="/insumos" element={<InsumosList />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

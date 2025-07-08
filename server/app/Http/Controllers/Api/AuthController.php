@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Rol;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Http\JsonResponse;
 
 
 class AuthController extends Controller
@@ -214,5 +216,33 @@ public function register(Request $request)
     public function logout(){
         JWTAuth::invalidate(JWTAuth::getToken());
         return response()->json(['message' => 'Sesión cerrada correctamente'],200);
+    }
+    
+    public function createRol(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'nombre_rol' => 'required|string|max:100|unique:rols,nombre_rol',
+        ], [
+            'nombre_rol.required' => 'El nombre del rol es obligatorio.',
+            'nombre_rol.string'   => 'El nombre debe ser texto.',
+            'nombre_rol.max'      => 'El nombre no puede superar los 100 caracteres.',
+            'nombre_rol.unique'   => 'Ya existe un rol con ese nombre.',
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error en la validación de datos',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+        
+        $rol = Rol::create($validator->validated());
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Rol creado correctamente',
+            'data'    => $rol,
+        ], 201);
     }
 }

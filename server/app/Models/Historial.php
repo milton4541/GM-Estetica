@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Historial extends Model
 {
+    protected $table = 'historiales';
     protected $primaryKey = 'id_historial';
     public $incrementing = true;
     protected $keyType = 'int';

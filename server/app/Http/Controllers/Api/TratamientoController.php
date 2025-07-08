@@ -101,8 +101,7 @@ class TratamientoController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"id_tratamiento","descripcion","duracion","precio"},
-     *             @OA\Property(property="id_tratamiento", type="integer", example=1),
+     *             required={"descripcion","duracion","precio"},
      *             @OA\Property(property="descripcion", type="string", example="Tratamiento facial"),
      *             @OA\Property(property="duracion", type="integer", example=60),
      *             @OA\Property(property="precio", type="number", format="float", example=1200.50)
@@ -123,15 +122,10 @@ class TratamientoController extends Controller
     public function createTratamiento(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'id_tratamiento' => 'required|integer|unique:tratamientos,id_tratamiento',
             'descripcion'    => 'required|string|max:255',
             'duracion'       => 'required|integer|min:1',
             'precio'         => 'required|numeric|min:0',
         ], [
-            'id_tratamiento.required' => 'El ID del tratamiento es obligatorio.',
-            'id_tratamiento.integer'  => 'El ID del tratamiento debe ser un número entero.',
-            'id_tratamiento.unique'   => 'Ya existe un tratamiento con ese ID.',
-
             'descripcion.required'    => 'La descripción es obligatoria.',
             'descripcion.string'      => 'La descripción debe ser texto.',
             'descripcion.max'         => 'La descripción no puede superar los 255 caracteres.',

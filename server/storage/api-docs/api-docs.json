@@ -1804,16 +1804,11 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "id_tratamiento",
                                     "descripcion",
                                     "duracion",
                                     "precio"
                                 ],
                                 "properties": {
-                                    "id_tratamiento": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
                                     "descripcion": {
                                         "type": "string",
                                         "example": "Tratamiento facial"
@@ -2380,7 +2375,8 @@
                 "tags": [
                     "Turnos"
                 ],
-                "summary": "Crear un nuevo turno",
+                "summary": "Crear uno o más turnos para un paciente",
+                "description": "Crea múltiples turnos para un mismo paciente en una fecha, a partir de un array de tratamientos. La hora se ajusta automáticamente según la duración de cada tratamiento.",
                 "operationId": "1ea57eb394eb5a25256f3802f91556f8",
                 "requestBody": {
                     "required": true,
@@ -2395,17 +2391,23 @@
                                 ],
                                 "properties": {
                                     "fecha": {
+                                        "description": "Formato: dd/mm/yyyy",
                                         "type": "string",
                                         "format": "date",
                                         "example": "02/07/2025"
                                     },
                                     "hora": {
+                                        "description": "Hora inicial del primer turno",
                                         "type": "string",
                                         "example": "15:30"
                                     },
                                     "id_tratamiento": {
-                                        "type": "integer",
-                                        "example": 1
+                                        "description": "Array de IDs de tratamientos a agendar en orden",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
                                     },
                                     "id_paciente": {
                                         "type": "integer",
@@ -2419,7 +2421,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Turno creado correctamente",
+                        "description": "Turnos creados correctamente",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2430,33 +2432,36 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Turno creado correctamente"
+                                            "example": "Turnos creados correctamente"
                                         },
                                         "data": {
-                                            "properties": {
-                                                "id_turno": {
-                                                    "type": "integer",
-                                                    "example": 10
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id_turno": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "fecha": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-07-02"
+                                                    },
+                                                    "hora": {
+                                                        "type": "string",
+                                                        "example": "15:30"
+                                                    },
+                                                    "id_tratamiento": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "id_paciente": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    }
                                                 },
-                                                "fecha": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": "2025-07-02"
-                                                },
-                                                "hora": {
-                                                    "type": "string",
-                                                    "example": "15:30"
-                                                },
-                                                "id_tratamiento": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "id_paciente": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                }
-                                            },
-                                            "type": "object"
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
