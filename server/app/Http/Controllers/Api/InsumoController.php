@@ -27,7 +27,6 @@ use Validator;
  *     @OA\Property(property="fecha_expiracion", type="string", example="2025-12-31"),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T12:00:00Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T12:00:00Z"),
- *     @OA\Property(property="alertaBajoStock", type="boolean", example=false)
  * )
  * 
  * @OA\Schema(
@@ -78,7 +77,7 @@ class InsumoController extends Controller
         $insumo = Insumo::all();
         if ($insumo->isEmpty()) {
             return response()->json([
-                'message' => 'No se encontraron tratamientos',
+                'message' => 'No se encontraron Insumos',
                 'success' => false,
             ], 404);
         }

@@ -2841,10 +2841,6 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-04T12:00:00Z"
-                    },
-                    "alertaBajoStock": {
-                        "type": "boolean",
-                        "example": false
                     }
                 },
                 "type": "object"
