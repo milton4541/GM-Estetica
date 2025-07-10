@@ -37,15 +37,16 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::patch('/tratamientos/{id}','updateTratamiento');
         Route::delete('/tratamientos/{id}','deleteTratamiento');
     });
+    
     Route::controller(TurnoController::class)->group(function () {
-        Route::get(   'turno',       'getTurnos'      );
-        Route::post(  'turno',       'createTurno'    );
-        Route::get(   'turno/{id}',  'getTurnoById'   );
-        Route::patch( 'turno/{id}',  'updateTurno'    );
-        Route::delete('turno/{id}',  'deleteTurno'    );
+        Route::get(   'turno',           'getTurnos'      );
+        Route::post(  'turno',           'createTurno'    );
+        Route::get(   'turno/{id}',      'getTurnoById'   );
+        Route::patch( 'turno/{id}',      'updateTurno'    );
+        Route::delete('turno/{id}',      'deleteTurno'    );
+        Route::post(  'turno/{id}/finalizar', 'finalizarTurno');
     });
 
-    
     Route::controller(InsumoController::class)->group(function () {
         Route::get(   'insumos',         'getInsumos');
         Route::get(   'insumos/{id}',    'getInsumoById');
@@ -62,8 +63,10 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::delete( 'factura/{id}',    'deleteFactura');
     });
     
-    Route::controller(HistorialController::class)->group(function(){
-        Route::get('historial', 'getHistorial');
+    Route::controller(HistorialController::class)->group(function () {
+        Route::get('historiales', 'getHistorial');
+        Route::get('historiales/paciente/{id}', 'getHistorialPorPaciente');
+        Route::get('historiales/tratamiento/{id}', 'getHistorialPorTratamiento');
     });
     
     Route::controller(TratamientoInsumoController::class)->group(function () {
@@ -75,9 +78,9 @@ Route::middleware([IsUserAuth::class])->group(function () {
     });
 
     Route::controller(ReporteAdministrativoController::class)->group(function () {
-    Route::get('reportes/ingresos-totales', 'ingresosTotales');
-    Route::get('reportes/ingresos-mensuales', 'ingresosPorMes');
-    Route::get('reportes/rendimiento-tratamientos', 'rendimientoPorTratamiento');
+        Route::get('reportes/ingresos-totales', 'ingresosTotales');
+        Route::get('reportes/ingresos-mensuales', 'ingresosPorMes');
+        Route::get('reportes/rendimiento-tratamientos', 'rendimientoPorTratamiento');
     });
 
     Route::get('/jwt-check', function () {
@@ -85,12 +88,13 @@ Route::middleware([IsUserAuth::class])->group(function () {
         'env' => env('JWT_SECRET'),
         'config' => config('jwt.secret')
     ]);
-});
-    Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
-    Route::post('logout', 'logout');
-    Route::get('user','getUser');
-    
     });
+    
+    Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
+        Route::post('logout', 'logout');
+        Route::get('user','getUser');
+    });
+
     Route::controller(DocumentoController::class)->group(function(){
         Route::get('documento', 'getDoc');
         Route::post('documento', 'createDoc');

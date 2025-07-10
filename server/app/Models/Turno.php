@@ -16,6 +16,7 @@ class Turno extends Model
         'hora',
         'id_tratamiento',
         'id_paciente',
+        'finalizado', 
     ];
 
     // Relación: un turno pertenece a un tratamiento

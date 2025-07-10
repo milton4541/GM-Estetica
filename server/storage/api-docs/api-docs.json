@@ -821,67 +821,117 @@
                 "operationId": "375e79a3f2fc3252960ebc57d6a4d247",
                 "responses": {
                     "200": {
-                        "description": "Listado de historiales",
+                        "description": "Historiales encontrados correctamente",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "paciente": {
-                                                        "properties": {
-                                                            "id_paciente": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "nombre": {
-                                                                "type": "string",
-                                                                "example": "Juan"
-                                                            },
-                                                            "apellido": {
-                                                                "type": "string",
-                                                                "example": "Pérez"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "tratamiento": {
-                                                        "properties": {
-                                                            "id_tratamiento": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "nombre": {
-                                                                "type": "string",
-                                                                "example": "Limpieza facial"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "example": "2025-07-02T12:00:00Z"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "example": "2025-07-02T12:00:00Z"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ResponseHistorialList"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron historiales",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseHistorialEmpty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/historiales/paciente/{id}": {
+            "get": {
+                "tags": [
+                    "Historiales"
+                ],
+                "summary": "Obtener historiales por paciente",
+                "operationId": "908c28f8609330d4bc9b5684cc44909a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del paciente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historiales encontrados correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseHistorialList"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron historiales",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseHistorialEmpty"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/historiales/tratamiento/{id}": {
+            "get": {
+                "tags": [
+                    "Historiales"
+                ],
+                "summary": "Obtener historiales por tratamiento",
+                "operationId": "dc617045037c3b8abe2c0c89594f880c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del tratamiento",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historiales encontrados correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseHistorialList"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron historiales",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseHistorialEmpty"
                                 }
                             }
                         }
@@ -2355,6 +2405,10 @@
                                                             }
                                                         },
                                                         "type": "object"
+                                                    },
+                                                    "finalizado": {
+                                                        "type": "boolean",
+                                                        "example": false
                                                     }
                                                 },
                                                 "type": "object"
@@ -2578,6 +2632,10 @@
                                                         }
                                                     },
                                                     "type": "object"
+                                                },
+                                                "finalizado": {
+                                                    "type": "boolean",
+                                                    "example": false
                                                 }
                                             },
                                             "type": "object"
@@ -2716,6 +2774,55 @@
                     }
                 }
             }
+        },
+        "/api/turnos/{id}/finalizar": {
+            "post": {
+                "tags": [
+                    "Turnos"
+                ],
+                "summary": "Finalizar un turno",
+                "operationId": "5c1956b587190900e0dc0520e2f55a99",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del turno a finalizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Turno finalizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Turno finalizado correctamente"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Turno no encontrado"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -2798,6 +2905,87 @@
                     "message": {
                         "type": "string",
                         "example": "Listado de facturas obtenido exitosamente"
+                    }
+                },
+                "type": "object"
+            },
+            "Historial": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "paciente": {
+                        "properties": {
+                            "id_paciente": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "nombre": {
+                                "type": "string",
+                                "example": "Juan"
+                            },
+                            "apellido": {
+                                "type": "string",
+                                "example": "Pérez"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "tratamiento": {
+                        "properties": {
+                            "id_tratamiento": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "nombre": {
+                                "type": "string",
+                                "example": "Limpieza facial"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-02T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-07-02T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseHistorialList": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Historiales encontrados correctamente"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Historial"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ResponseHistorialEmpty": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "No se encontraron historiales"
                     }
                 },
                 "type": "object"
@@ -3143,7 +3331,7 @@
         },
         {
             "name": "Historiales",
-            "description": "Operaciones sobre historiales de pacientes"
+            "description": "Operaciones sobre historiales clínicos"
         },
         {
             "name": "Insumos",
