@@ -39,12 +39,12 @@ Route::middleware([IsUserAuth::class])->group(function () {
     });
     
     Route::controller(TurnoController::class)->group(function () {
-        Route::get(   'turno',           'getTurnos'      );
-        Route::post(  'turno',           'createTurno'    );
-        Route::get(   'turno/{id}',      'getTurnoById'   );
-        Route::patch( 'turno/{id}',      'updateTurno'    );
-        Route::delete('turno/{id}',      'deleteTurno'    );
-        Route::post(  'turno/{id}/finalizar', 'finalizarTurno');
+        Route::get(   'turnos',           'getTurnos'      );
+        Route::post(  'turnos',           'createTurno'    );
+        Route::get(   'turnos/{id}',      'getTurnoById'   );
+        Route::patch( 'turnos/{id}',      'updateTurno'    );
+        Route::delete('turnos/{id}',      'deleteTurno'    );
+        Route::post(  'turnos/{id}/finalizar', 'finalizarTurno');
     });
 
     Route::controller(InsumoController::class)->group(function () {
