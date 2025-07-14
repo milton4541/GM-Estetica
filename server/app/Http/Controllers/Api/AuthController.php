@@ -140,6 +140,9 @@ public function register(Request $request)
     if ($validator->fails()) {
         return response()->json(['error' => $validator->errors()], 422);
     }
+
+    //dd(env('JWT_SECRET'));
+
     $credentials = [
         'nombre_usuario' => $request->nombre_usuario,
         'password' => $request->password,

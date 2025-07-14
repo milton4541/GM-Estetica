@@ -193,113 +193,105 @@ class TurnoController extends Controller
         ], 200);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/turnos",
-     *     summary="Crear uno o más turnos para un paciente",
-     *     description="Crea múltiples turnos para un mismo paciente en una fecha, a partir de un array de tratamientos. La hora se ajusta automáticamente según la duración de cada tratamiento.",
-     *     tags={"Turnos"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"fecha","hora","id_tratamiento","id_paciente"},
-     *             @OA\Property(property="fecha", type="string", format="date", example="02/07/2025", description="Formato: dd/mm/yyyy"),
-     *             @OA\Property(property="hora", type="string", example="15:30", description="Hora inicial del primer turno"),
-     *             @OA\Property(
-     *                 property="id_tratamiento",
-     *                 type="array",
-     *                 @OA\Items(type="integer", example=1),
-     *                 description="Array de IDs de tratamientos a agendar en orden"
-     *             ),
-     *             @OA\Property(property="id_paciente", type="integer", example=2)
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Turnos creados correctamente",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Turnos creados correctamente"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id_turno", type="integer", example=10),
-     *                     @OA\Property(property="fecha", type="string", format="date", example="2025-07-02"),
-     *                     @OA\Property(property="hora", type="string", example="15:30"),
-     *                     @OA\Property(property="id_tratamiento", type="integer", example=1),
-     *                     @OA\Property(property="id_paciente", type="integer", example=2)
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Error en la validación de datos"
-     *     )
-     * )
-     */
-    public function createTurno(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'fecha'          => 'required|date_format:d/m/Y',
-            'hora'           => 'required|date_format:H:i',
-            'id_tratamiento'   => 'required|array|min:1',
-            'id_tratamiento.*' => 'integer|exists:tratamientos,id_tratamiento',
-            'id_paciente'    => 'required|integer|exists:pacientes,id_paciente',
-        ], [
-            'fecha.required'          => 'La fecha es obligatoria.',
-            'fecha.date_format'       => 'La fecha debe tener formato dd/mm/aaaa.',
-            'hora.required'           => 'La hora es obligatoria.',
-            'hora.date_format'        => 'La hora debe tener formato HH:MM.',
-            'id_tratamiento.required' => 'El ID del tratamiento es obligatorio.',
-            'id_tratamiento.exists'   => 'El tratamiento no existe.',
-            'id_paciente.required'    => 'El ID del paciente es obligatorio.',
-            'id_paciente.exists'      => 'El paciente no existe.',
-        ]);
+/**
+ * @OA\Post(
+ *     path="/api/turnos",
+ *     summary="Crear uno o más turnos para un paciente",
+ *     description="Crea múltiples turnos para un mismo paciente en una fecha, a partir de un array de tratamientos. La hora se ajusta automáticamente según la duración de cada tratamiento.",
+ *     tags={"Turnos"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"fecha","hora","id_tratamiento","id_paciente"},
+ *             @OA\Property(property="fecha", type="string", format="date", example="02/07/2025", description="Formato: dd/mm/yyyy"),
+ *             @OA\Property(property="hora", type="string", example="15:30", description="Hora inicial del primer turno"),
+ *             @OA\Property(
+ *                 property="id_tratamiento",
+ *                 type="array",
+ *                 @OA\Items(type="integer", example=1),
+ *                 description="Array de IDs de tratamientos a agendar en orden"
+ *             ),
+ *             @OA\Property(property="id_paciente", type="integer", example=2)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Turnos creados correctamente",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Turnos creados correctamente"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id_turno", type="integer", example=10),
+ *                     @OA\Property(property="fecha", type="string", format="date", example="2025-07-02"),
+ *                     @OA\Property(property="hora", type="string", example="15:30"),
+ *                     @OA\Property(property="id_tratamiento", type="integer", example=1),
+ *                     @OA\Property(property="id_paciente", type="integer", example=2)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Error en la validación de datos"
+ *     )
+ * )
+ */
+public function createTurno(Request $request): JsonResponse
+{
+    $validator = Validator::make($request->all(), [
+        'fecha'          => 'required|date_format:d/m/Y',
+        'hora'           => 'required|date_format:H:i',
+        'id_tratamiento'   => 'required|array|min:1',
+        'id_tratamiento.*' => 'integer|exists:tratamientos,id_tratamiento',
+        'id_paciente'    => 'required|integer|exists:pacientes,id_paciente',
+    ], [
+        'fecha.required'          => 'La fecha es obligatoria.',
+        'fecha.date_format'       => 'La fecha debe tener formato dd/mm/aaaa.',
+        'hora.required'           => 'La hora es obligatoria.',
+        'hora.date_format'        => 'La hora debe tener formato HH:MM.',
+        'id_tratamiento.required' => 'El ID del tratamiento es obligatorio.',
+        'id_tratamiento.exists'   => 'El tratamiento no existe.',
+        'id_paciente.required'    => 'El ID del paciente es obligatorio.',
+        'id_paciente.exists'      => 'El paciente no existe.',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error en la validación de datos',
-                'errors'  => $validator->errors(),
-            ], 422);
-        }
-
-        $data = $validator->validated();
-        $data['fecha'] = Carbon::createFromFormat('d/m/Y', $data['fecha'])->format('Y-m-d');
-
-        $hora = Carbon::createFromFormat('H:i', $data['hora']);
-        $turnos = [];
-        foreach ($data['id_tratamiento'] as $tratamientoId) {
-            $tratamiento = Tratamiento::findOrFail($tratamientoId);
-            
-            $turno = Turno::create([
-                'fecha' => $data['fecha'],
-                'hora' => $hora->format('H:i'),
-                'id_paciente' => $data['id_paciente'],
-                'id_tratamiento' => $tratamiento->id_tratamiento,
-            ]);
-            
-            Historial::create([
-                'id_paciente' => $turno->id_paciente,
-                'id_tratamiento' => $turno->id_tratamiento,
-                'fecha' => $turno->fecha,
-                'observaciones' => 'Turno agendado para ' . $turno->fecha . ' a las ' . $turno->hora,
-            ]);
-            
-            $turnos[] = $turno;
-
-            $hora->addMinutes($tratamiento->duracion);
-        }
-
+    if ($validator->fails()) {
         return response()->json([
-            'success' => true,
-            'data' => $turnos,
-            'message' => 'Turnos creados correctamente',
-        ], 201);
+            'success' => false,
+            'message' => 'Error en la validación de datos',
+            'errors'  => $validator->errors(),
+        ], 422);
     }
+
+    $data = $validator->validated();
+    $data['fecha'] = Carbon::createFromFormat('d/m/Y', $data['fecha'])->format('Y-m-d');
+
+    $hora = Carbon::createFromFormat('H:i', $data['hora']);
+    $turnos = [];
+    foreach ($data['id_tratamiento'] as $tratamientoId) {
+        $tratamiento = Tratamiento::findOrFail($tratamientoId);
+        
+        $turno = Turno::create([
+            'fecha' => $data['fecha'],
+            'hora' => $hora->format('H:i'),
+            'id_paciente' => $data['id_paciente'],
+            'id_tratamiento' => $tratamiento->id_tratamiento,
+        ]);
+        
+        $turnos[] = $turno;
+        $hora->addMinutes($tratamiento->duracion);
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => $turnos,
+        'message' => 'Turnos creados correctamente',
+    ], 201);
+}
 
     /**
      * @OA\Put(
@@ -429,47 +421,56 @@ class TurnoController extends Controller
     }
 
     /**
-     * @OA\Post(
-     *     path="/api/turnos/{id}/finalizar",
-     *     summary="Finalizar un turno",
-     *     tags={"Turnos"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID del turno a finalizar",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Turno finalizado correctamente",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Turno finalizado correctamente"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(response=404, description="Turno no encontrado")
-     * )
-     */
-    public function finalizarTurno($id): JsonResponse
-    {
-        $turno = Turno::find($id);
+ * @OA\Post(
+ *     path="/api/turnos/{id}/finalizar",
+ *     summary="Finalizar un turno",
+ *     tags={"Turnos"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         description="ID del turno a finalizar",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Turno finalizado correctamente",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Turno finalizado correctamente"),
+ *             @OA\Property(property="data", type="object")
+ *         )
+ *     ),
+ *     @OA\Response(response=404, description="Turno no encontrado")
+ * )
+ */
+public function finalizarTurno($id): JsonResponse
+{
+    $turno = Turno::find($id);
 
-        if (!$turno) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Turno no encontrado',
-            ], 404);
-        }
-
-        $turno->finalizado = true;
-        $turno->save();
-
+    if (!$turno) {
         return response()->json([
-            'success' => true,
-            'message' => 'Turno finalizado correctamente',
-            'data'    => $turno,
-        ], 200);
+            'success' => false,
+            'message' => 'Turno no encontrado',
+        ], 404);
     }
+
+    $turno->finalizado = true;
+    $turno->save();
+
+    // Crea historial 
+    Historial::create([
+        'id_paciente'    => $turno->id_paciente,
+        'id_tratamiento' => $turno->id_tratamiento,
+        'fecha'          => $turno->fecha,
+        'observaciones'  => 'Turno finalizado el ' . $turno->fecha . ' a las ' . $turno->hora,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Turno finalizado correctamente',
+        'data'    => $turno,
+    ], 200);
+}
+
 }
