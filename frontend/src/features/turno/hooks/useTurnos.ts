@@ -5,6 +5,7 @@ import { showNotification } from "../../../utils/showNotification";
 import { addTurnoAPI } from "../api/addTurnoApi";
 import { deleteTurnoAPI } from "../api/deleteTurnoApi";
 import { editTurnoAPI } from "../api/editTurnoApi";
+import { createDoc } from "../../historial/api/CreateDoc";
 
 export interface CalendarEvent {
   id: string;
@@ -88,6 +89,10 @@ const addTurno = async (turno: NewTurno) => {
   const finaliceTurno = async (id_turno: number,turno: FinalizePayload) => {
     try {
       await finaliceTurno(id_turno, turno);
+      if (turno.documento) {
+        await createDoc(turno.documento, turno.id_tratamiento);
+      }
+      
       showNotification("success", "Cita creada correctamente");
       await fetchTurnos();
     } catch (err) {

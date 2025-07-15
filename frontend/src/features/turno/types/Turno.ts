@@ -27,6 +27,5 @@ export interface UpdateTurno {
 export interface FinalizePayload {
   documento: File | null;
   stock_usado: number;
-  descuento_precio: number;
-  descuento_porcentaje: number;
+  id_tratamiento: number
 }
