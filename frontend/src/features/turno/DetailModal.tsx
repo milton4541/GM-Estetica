@@ -25,10 +25,7 @@ export default function DetailModal({
   const [mode, setMode] = useState<"view"|"edit"|"confirmDelete"|"finalize">("view");
   const [file, setFile] = useState<File|null>(null);
   const [stockUsado, setStockUsado] = useState<number>(0);
-  const [descuentoPrecio, setDescuentoPrecio] = useState<number>(0);
-  const [descuentoPct, setDescuentoPct] = useState<number>(0);
 
-  // ① Inicializamos formData como UpdateTurno, no como Turno
   const [formData, setFormData] = useState<UpdateTurno>({
     id_turno: turno.id_turno,
     fecha: turno.fecha,
@@ -57,8 +54,8 @@ export default function DetailModal({
     const payload: FinalizePayload = {
       documento: file,
       stock_usado: stockUsado,
-      descuento_precio: descuentoPrecio,
-      descuento_porcentaje: descuentoPct,
+
+      id_tratamiento: formData.id_tratamiento
     };
     await onFinalize(turno.id_turno, payload);
     onClose();
@@ -183,28 +180,6 @@ export default function DetailModal({
                   onChange={e => setStockUsado(+e.target.value)}
                   className="mt-1 block w-full rounded-md border-gray-300"
                 />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Descuento Precio</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={descuentoPrecio}
-                    onChange={e => setDescuentoPrecio(+e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Descuento %</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={descuentoPct}
-                    onChange={e => setDescuentoPct(+e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300"
-                  />
-                </div>
               </div>
             </>
           )}

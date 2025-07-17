@@ -98,8 +98,8 @@ Route::middleware([IsUserAuth::class])->group(function () {
     });
 
     Route::controller(DocumentoController::class)->group(function(){
-        Route::get('documento', 'getDoc');
-        Route::post('documento', 'createDoc');
+        Route::get('documentos', 'getDoc');
+        Route::post('documentos', 'createDoc');
     });
     
 
