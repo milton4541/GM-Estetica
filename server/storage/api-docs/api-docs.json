@@ -1311,6 +1311,259 @@
                 ]
             }
         },
+        "/api/insumos/actualizar-stock": {
+            "put": {
+                "tags": [
+                    "Insumos"
+                ],
+                "summary": "Actualizar stock según tratamiento finalizado",
+                "operationId": "c8f7d4fa771421f88b64acd55cd07e66",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_tratamiento",
+                                    "cantidad"
+                                ],
+                                "properties": {
+                                    "id_tratamiento": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "cantidad": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Stock actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Stock actualizado correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron insumos relacionados al tratamiento",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No se encontraron insumos relacionados al tratamiento"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error en la validación de datos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en la validación de datos"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "id_tratamiento": [
+                                                    "El campo id_tratamiento es obligatorio."
+                                                ],
+                                                "cantidad": [
+                                                    "El campo cantidad debe ser un número entero mayor o igual a 1."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/insumos/reestock": {
+            "put": {
+                "tags": [
+                    "Insumos"
+                ],
+                "summary": "Reabastecer stock de un insumo",
+                "operationId": "65fbda3f911f02014516f0dcc6fac7e6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_insumo",
+                                    "cantidad"
+                                ],
+                                "properties": {
+                                    "id_insumo": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "cantidad": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Stock reabastecido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Stock reabastecido correctamente"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id_insumo": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "nombre": {
+                                                    "type": "string",
+                                                    "example": "Guantes de látex"
+                                                },
+                                                "cantidad": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "descripcion": {
+                                                    "type": "string",
+                                                    "example": "Guantes para uso médico"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-07-15T09:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-07-15T10:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Insumo no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Insumo no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error en la validación de datos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en la validación de datos"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "id_insumo": [
+                                                    "El campo id_insumo es obligatorio."
+                                                ],
+                                                "cantidad": [
+                                                    "El campo cantidad debe ser un número entero mayor o igual a 1."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/pacientes": {
             "get": {
                 "tags": [
@@ -2165,7 +2418,8 @@
                             "schema": {
                                 "required": [
                                     "id_tratamiento",
-                                    "id_insumo"
+                                    "id_insumo",
+                                    "cantidad"
                                 ],
                                 "properties": {
                                     "id_tratamiento": {
@@ -2175,6 +2429,10 @@
                                     "id_insumo": {
                                         "type": "integer",
                                         "example": 2
+                                    },
+                                    "cantidad": {
+                                        "type": "integer",
+                                        "example": 3
                                     }
                                 },
                                 "type": "object"
@@ -2261,6 +2519,10 @@
                                         "example": 1
                                     },
                                     "id_insumo": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "cantidad": {
                                         "type": "integer",
                                         "example": 2
                                     }
@@ -3289,32 +3551,32 @@
                 "required": [
                     "id",
                     "id_tratamiento",
-                    "id_insumo"
+                    "id_insumo",
+                    "cantidad"
                 ],
                 "properties": {
                     "id": {
-                        "description": "ID de la relación",
                         "type": "integer",
                         "example": 1
                     },
                     "id_tratamiento": {
-                        "description": "ID del tratamiento",
                         "type": "integer",
                         "example": 1
                     },
                     "id_insumo": {
-                        "description": "ID del insumo",
                         "type": "integer",
                         "example": 2
                     },
+                    "cantidad": {
+                        "type": "integer",
+                        "example": 3
+                    },
                     "created_at": {
-                        "description": "Fecha de creación",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-04T15:00:00Z"
                     },
                     "updated_at": {
-                        "description": "Fecha de actualización",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-07-04T15:00:00Z"

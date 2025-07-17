@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+
 class Documentos extends Model
 {
     protected $table = 'doc_trabajos';
@@ -14,7 +15,7 @@ class Documentos extends Model
     protected $fillable = [
         'nombre_doc',
         'url',
-        'tratamiento_id',
+        'historial_id', 
         'doc_trabajo_guid',
         'eliminado',
     ];
@@ -28,14 +29,16 @@ class Documentos extends Model
     {
         parent::boot();
         static::creating(function ($model) {
-            if (! $model->doc_trabajo_guid) {
+            if (!$model->doc_trabajo_guid) {
                 $model->doc_trabajo_guid = (string) Str::uuid();
             }
         });
     }
 
-    public function tratamiento()
+
+    public function historial()
     {
-        return $this->belongsTo(Tratamiento::class, 'tratamiento_id', 'id_tratamiento');
+        return $this->belongsTo(Historial::class, 'historial_id', 'id_historial');
     }
 }
+

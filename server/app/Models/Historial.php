@@ -30,4 +30,11 @@ class Historial extends Model
     {
         return $this->belongsTo(Tratamiento::class, 'id_tratamiento', 'id_tratamiento');
     }
+
+    // Relacion al historial
+    public function documentos()
+    {
+        return $this->hasMany(Documentos::class, 'historial_id', 'id_historial');
+    }
+
 }

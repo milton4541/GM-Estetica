@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\TratamientoInsumo;
 use App\Models\Insumo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -329,4 +330,193 @@ class InsumoController extends Controller
             'message' => 'Insumo eliminado correctamente',
         ], 200);
     }
+
+/**
+ * @OA\Put(
+ *     path="/api/insumos/actualizar-stock",
+ *     summary="Actualizar stock según tratamiento finalizado",
+ *     tags={"Insumos"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"id_tratamiento", "cantidad"},
+ *             @OA\Property(property="id_tratamiento", type="integer", example=1),
+ *             @OA\Property(property="cantidad", type="integer", example=2)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Stock actualizado correctamente",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Stock actualizado correctamente")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="No se encontraron insumos relacionados al tratamiento",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="No se encontraron insumos relacionados al tratamiento")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Error en la validación de datos",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Error en la validación de datos"),
+ *             @OA\Property(
+ *                 property="errors",
+ *                 type="object",
+ *                 example={
+ *                     "id_tratamiento": {"El campo id_tratamiento es obligatorio."},
+ *                     "cantidad": {"El campo cantidad debe ser un número entero mayor o igual a 1."}
+ *                 }
+ *             )
+ *         )
+ *     )
+ * )
+ */
+    public function actualizarStock(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'id_tratamiento' => 'required|exists:tratamiento,id_tratamiento',
+            'cantidad' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error en la validación de datos',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $idTratamiento = $request->id_tratamiento;
+        $cantidadTratamientos = $request->cantidad;
+
+        $relaciones = TratamientoInsumo::where('id_tratamiento', $idTratamiento)->get();
+
+        if ($relaciones->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se encontraron insumos relacionados al tratamiento'
+            ], 404);
+        }
+
+        foreach ($relaciones as $rel) {
+            $insumo = Insumo::find($rel->id_insumo);
+            if ($insumo) {
+                $descuento = $rel->cantidad * $cantidadTratamientos;
+                $insumo->cantidad = max(0, $insumo->cantidad - $descuento);
+                $insumo->save();
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock actualizado correctamente'
+        ], 200);
+    }
+
+ /**
+ * @OA\Put(
+ *     path="/api/insumos/reestock",
+ *     summary="Reabastecer stock de un insumo",
+ *     tags={"Insumos"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"id_insumo", "cantidad"},
+ *             @OA\Property(property="id_insumo", type="integer", example=1),
+ *             @OA\Property(property="cantidad", type="integer", example=5)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Stock reabastecido correctamente",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Stock reabastecido correctamente"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id_insumo", type="integer", example=1),
+ *                 @OA\Property(property="nombre", type="string", example="Guantes de látex"),
+ *                 @OA\Property(property="cantidad", type="integer", example=25),
+ *                 @OA\Property(property="descripcion", type="string", example="Guantes para uso médico"),
+ *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-15T09:00:00Z"),
+ *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-15T10:00:00Z")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Insumo no encontrado",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Insumo no encontrado")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Error en la validación de datos",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="success", type="boolean", example=false),
+ *             @OA\Property(property="message", type="string", example="Error en la validación de datos"),
+ *             @OA\Property(
+ *                 property="errors",
+ *                 type="object",
+ *                 example={
+ *                     "id_insumo": {"El campo id_insumo es obligatorio."},
+ *                     "cantidad": {"El campo cantidad debe ser un número entero mayor o igual a 1."}
+ *                 }
+ *             )
+ *         )
+ *     )
+ * )
+ */
+    public function reestock(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'id_insumo' => 'required|exists:insumo,id_insumo',
+            'cantidad' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error en la validación de datos',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $insumo = Insumo::find($request->id_insumo);
+
+        if (!$insumo) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Insumo no encontrado'
+            ], 404);
+        }
+
+        $insumo->cantidad += $request->cantidad;
+        $insumo->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Stock reabastecido correctamente',
+            'data' => $insumo
+        ], 200);
+    }
 }
+

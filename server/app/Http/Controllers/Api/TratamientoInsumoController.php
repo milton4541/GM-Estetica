@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\Validator;
  *     schema="TratamientoInsumo",
  *     type="object",
  *     title="TratamientoInsumo",
- *     required={"id", "id_tratamiento", "id_insumo"},
- *     @OA\Property(property="id", type="integer", example=1, description="ID de la relación"),
- *     @OA\Property(property="id_tratamiento", type="integer", example=1, description="ID del tratamiento"),
- *     @OA\Property(property="id_insumo", type="integer", example=2, description="ID del insumo"),
- *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T15:00:00Z", description="Fecha de creación"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T15:00:00Z", description="Fecha de actualización")
+ *     required={"id", "id_tratamiento", "id_insumo", "cantidad"},
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="id_tratamiento", type="integer", example=1),
+ *     @OA\Property(property="id_insumo", type="integer", example=2),
+ *     @OA\Property(property="cantidad", type="integer", example=3),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-07-04T15:00:00Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-07-04T15:00:00Z")
  * )
  *
  * @OA\Tag(
@@ -69,9 +70,10 @@ class TratamientoInsumoController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"id_tratamiento","id_insumo"},
+     *             required={"id_tratamiento","id_insumo","cantidad"},
      *             @OA\Property(property="id_tratamiento", type="integer", example=1),
-     *             @OA\Property(property="id_insumo", type="integer", example=2)
+     *             @OA\Property(property="id_insumo", type="integer", example=2),
+     *             @OA\Property(property="cantidad", type="integer", example=3)
      *         )
      *     ),
      *     @OA\Response(
@@ -90,11 +92,15 @@ class TratamientoInsumoController extends Controller
         $validator = Validator::make($request->all(), [
             'id_tratamiento' => 'required|exists:tratamiento,id_tratamiento',
             'id_insumo'      => 'required|exists:insumo,id_insumo',
+            'cantidad'       => 'required|integer|min:1',
         ], [
             'id_tratamiento.required' => 'El ID del tratamiento es obligatorio.',
             'id_tratamiento.exists'   => 'El tratamiento no existe.',
             'id_insumo.required'      => 'El ID del insumo es obligatorio.',
             'id_insumo.exists'        => 'El insumo no existe.',
+            'cantidad.required'       => 'La cantidad es obligatoria.',
+            'cantidad.integer'        => 'La cantidad debe ser un número entero.',
+            'cantidad.min'            => 'La cantidad debe ser al menos 1.',
         ]);
 
         if ($validator->fails()) {
@@ -171,7 +177,8 @@ class TratamientoInsumoController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="id_tratamiento", type="integer", example=1),
-     *             @OA\Property(property="id_insumo", type="integer", example=2)
+     *             @OA\Property(property="id_insumo", type="integer", example=2),
+     *             @OA\Property(property="cantidad", type="integer", example=2)
      *         )
      *     ),
      *     @OA\Response(
@@ -203,6 +210,7 @@ class TratamientoInsumoController extends Controller
         $rules = [
             'id_tratamiento' => 'sometimes|required|exists:tratamiento,id_tratamiento',
             'id_insumo'      => 'sometimes|required|exists:insumo,id_insumo',
+            'cantidad'       => 'sometimes|required|integer|min:1',
         ];
 
         $messages = [
@@ -210,6 +218,9 @@ class TratamientoInsumoController extends Controller
             'id_tratamiento.exists'   => 'El tratamiento no existe.',
             'id_insumo.required'      => 'El ID del insumo es obligatorio.',
             'id_insumo.exists'        => 'El insumo no existe.',
+            'cantidad.required'       => 'La cantidad es obligatoria.',
+            'cantidad.integer'        => 'La cantidad debe ser un número entero.',
+            'cantidad.min'            => 'La cantidad debe ser al menos 1.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);

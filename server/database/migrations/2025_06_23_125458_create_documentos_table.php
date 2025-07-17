@@ -9,20 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up()
+    public function up()
     {
         Schema::create('doc_trabajos', function (Blueprint $table) {
             $table->increments('doc_id');
             $table->string('nombre_doc');
-            $table->string('url');                // e.g. "archivos/uuid.png"
-            $table->unsignedInteger('tratamiento_id');
+            $table->string('url'); // e.g. "archivos/uuid.png"
+            $table->unsignedInteger('historial_id'); 
             $table->uuid('doc_trabajo_guid')->unique();
             $table->boolean('eliminado')->default(false);
             $table->timestamps();
 
-            $table->foreign('tratamiento_id')
-                  ->references('id_tratamiento')
-                  ->on('tratamientos')
+            $table->foreign('historial_id') // cambio aquí
+                  ->references('id_historial')
+                  ->on('historial') // tabla historial
                   ->onDelete('cascade');
         });
     }
@@ -32,3 +32,4 @@ return new class extends Migration
         Schema::dropIfExists('doc_trabajos');
     }
 };
+

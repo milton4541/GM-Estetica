@@ -14,6 +14,7 @@ class TratamientoInsumo extends Model
     protected $fillable = [
         'id_tratamiento',
         'id_insumo',
+        'cantidad',
     ];
 }
 

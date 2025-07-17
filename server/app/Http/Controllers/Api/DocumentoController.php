@@ -26,7 +26,7 @@ class DocumentoController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="nombre_doc", type="string", example="informe.pdf"),
      *                     @OA\Property(property="url", type="string", example="http://localhost/archivos/uuid.pdf"),
-     *                     @OA\Property(property="tratamiento_id", type="integer", example=3),
+     *                     @OA\Property(property="historial_id", type="integer", example=3),
      *                     @OA\Property(property="eliminado", type="boolean", example=false),
      *                     @OA\Property(property="created_at", type="string", example="2025-07-02T12:00:00.000000Z"),
      *                     @OA\Property(property="updated_at", type="string", example="2025-07-02T12:00:00.000000Z")
@@ -58,14 +58,14 @@ class DocumentoController extends Controller
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                 required={"archivo", "tratamiento_id"},
+     *                 required={"archivo", "historial_id"},
      *                 @OA\Property(
      *                     property="archivo",
      *                     type="string",
      *                     format="binary"
      *                 ),
      *                 @OA\Property(
-     *                     property="tratamiento_id",
+     *                     property="historial_id",
      *                     type="integer",
      *                     example=3
      *                 )
@@ -81,7 +81,7 @@ class DocumentoController extends Controller
      *                 @OA\Property(property="id", type="integer", example=10),
      *                 @OA\Property(property="nombre_doc", type="string", example="archivo.pdf"),
      *                 @OA\Property(property="url", type="string", example="http://localhost/archivos/uuid.pdf"),
-     *                 @OA\Property(property="tratamiento_id", type="integer", example=3),
+     *                 @OA\Property(property="historial_id", type="integer", example=3),
      *                 @OA\Property(property="created_at", type="string", example="2025-07-02T12:00:00.000000Z"),
      *                 @OA\Property(property="updated_at", type="string", example="2025-07-02T12:00:00.000000Z")
      *             )
@@ -96,23 +96,23 @@ class DocumentoController extends Controller
     public function createDoc(Request $request): JsonResponse
     {
         $request->validate([
-            'archivo'        => 'required|file|max:5120',
-            'tratamiento_id' => 'required|integer|exists:tratamientos,id_tratamiento',
+            'archivo'       => 'required|file|max:5120',
+            'historial_id'  => 'required|integer|exists:historial,id_historial',
         ]);
 
         $file       = $request->file('archivo');
         $original   = $file->getClientOriginalName();
         $extension  = $file->getClientOriginalExtension();
-        $filename   = Str::uuid().'.'.$extension;
+        $filename   = Str::uuid() . '.' . $extension;
 
         $file->move(public_path('archivos'), $filename);
 
         $url = url("archivos/{$filename}");
 
         $doc = Documentos::create([
-            'nombre_doc'      => $original,
-            'url'             => $url,
-            'tratamiento_id'  => $request->tratamiento_id,
+            'nombre_doc'     => $original,
+            'url'            => $url,
+            'historial_id'   => $request->historial_id,
         ]);
 
         return response()->json([

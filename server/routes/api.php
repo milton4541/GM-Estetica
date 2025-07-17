@@ -48,11 +48,13 @@ Route::middleware([IsUserAuth::class])->group(function () {
     });
 
     Route::controller(InsumoController::class)->group(function () {
-        Route::get(   'insumos',         'getInsumos');
-        Route::get(   'insumos/{id}',    'getInsumoById');
-        Route::post(  'insumos',         'createInsumo');
-        Route::patch( 'insumos/{id}',    'updateInsumo');
-        Route::delete('insumos/{id}',    'deleteInsumo');
+        Route::get(   'insumos',            'getInsumos');
+        Route::get(   'insumos/{id}',       'getInsumoById');
+        Route::post(  'insumos',            'createInsumo');
+        Route::patch( 'insumos/{id}',       'updateInsumo');
+        Route::delete('insumos/{id}',       'deleteInsumo');
+        Route::put(   'insumos/actualizar-stock', 'actualizarStock');
+        Route::put(   'insumos/reestock',          'reestock');
     });
 
     Route::controller(FacturaController::class)->group(function () {
