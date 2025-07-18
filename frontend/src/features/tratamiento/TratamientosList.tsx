@@ -7,9 +7,11 @@ import ConfirmAction from '../../components/confirmAction';
 import useTratamientos from './hooks/useTratamientos';
 import TratamientoForm from './TratamientosForm';
 import TratamientoEditForm from './TratamientosEditForm';
+import useInsumos from '../insumo/hooks/useInsumos';
 
 export default function TratamientoList() {
   const { tratamientos, addTratamiento, deleteTratamiento, editTratamiento } = useTratamientos();
+  const {insumos} = useInsumos();
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -41,8 +43,9 @@ export default function TratamientoList() {
       </button>
 
       <Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
-        <TratamientoForm onSubmit={handleAdd} />
-      </Modal>
+      <TratamientoForm
+        onSubmit={handleAdd} insumos={insumos}   
+      />      </Modal>
 
       <TableContainer component={Paper}>
         <Table>

@@ -7,6 +7,7 @@ import PacienteList from "./features/paciente/PacienteList";
 import InsumosList from "./features/insumo/InsumosList";
 import TratamientoList from "./features/tratamiento/TratamientosList";
 import CalendarPage from "./features/turno/calendar";
+import { HistorialTratamientos } from "./features/historial/HistorialList";
 export default function AppRouter() {
     return (
 <BrowserRouter>
@@ -23,6 +24,7 @@ export default function AppRouter() {
           }
         >
           <Route path="/" element={<CalendarPage />} />
+          <Route path="/historial" element={<HistorialTratamientos />} />
           <Route path="/pacientes" element={<PacienteList />} />
           <Route path="/insumos" element={<InsumosList />} />
           <Route path="/tratamientos" element={<TratamientoList />} />

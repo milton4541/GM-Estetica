@@ -1,12 +1,10 @@
 import axios from "axios";
 import api from "../../../utils/axios";
-import type { Tratamiento } from "../types/tratamiento";
+import type { Tratamiento, TratamientoWithId } from "../types/tratamiento";
 
 const API_URL_NEW_CLIENT = '/tratamientos';
 
-
-
-export const addTratamientoApi = async (tratamientoData: Tratamiento): Promise<Tratamiento> => {
+export const addTratamientoApi = async (tratamientoData: Tratamiento): Promise<TratamientoWithId> => {
     try {
         const token = localStorage.getItem('authToken');
         const response = await api.post(
@@ -20,7 +18,7 @@ export const addTratamientoApi = async (tratamientoData: Tratamiento): Promise<T
             }
         );
         console.log("Respuesta de la API:", response.data); // <-- Verifica la respuesta
-        return response.data
+        return response.data.data
     } catch (error) {
         console.error("Error creating new tratamiento:", error);
         // Lanza un error con un mensaje más descriptivo

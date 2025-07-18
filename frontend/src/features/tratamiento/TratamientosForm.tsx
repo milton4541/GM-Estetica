@@ -1,41 +1,45 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import Select from "react-select";
 import type { Tratamiento } from "./types/tratamiento";
+import type { insumoWithId } from "../insumo/types/insumo";
 
 interface TratamientoFormProps {
   onSubmit: (tratamiento: Tratamiento) => void;
+  insumos: insumoWithId[];                  // lista de insumos disponibles
 }
 
+// Aprovechamos exactamente tu tipo Tratamiento (incluye insumos: Insumo[])
 type TratamientoFormValues = Tratamiento;
 
-const TratamientoForm: React.FC<TratamientoFormProps> = ({ onSubmit }) => {
+const TratamientoForm: React.FC<TratamientoFormProps> = ({
+  onSubmit,
+  insumos: availableInsumos,
+}) => {
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
-  } = useForm<TratamientoFormValues>();
+  } = useForm<TratamientoFormValues>({
+    defaultValues: { descripcion: "", duracion: 0, precio: 0, insumo: [] },
+  });
 
   const onFormSubmit = (data: TratamientoFormValues) => {
-    // convertir números en caso de ser strings
-    const tratamiento: Tratamiento = {
-      descripcion: data.descripcion,
-      duracion: Number(data.duracion),
-      precio: Number(data.precio),
-    };
-    onSubmit(tratamiento);
+    // conviertes strings a number si hiciera falta, aunque aquí ya los manejas como number
+    onSubmit(data);
     reset();
   };
 
   return (
-    <div className="relative bg-white rounded-lg shadow-sm">
-      <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Agregar Tratamiento</h3>
+    <div className="bg-white rounded-lg shadow-sm">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h3 className="text-lg font-semibold">Agregar Tratamiento</h3>
       </div>
 
-      <form onSubmit={handleSubmit(onFormSubmit)} className="p-4 md:p-5">
+      <form onSubmit={handleSubmit(onFormSubmit)} className="p-4">
         <div className="grid gap-4 mb-4 grid-cols-2">
-          {/* Descripción */}
-          <div className="col-span-2">
+ <div className="col-span-2">
             <label htmlFor="descripcion" className="block mb-2 text-sm font-medium text-gray-900">
               Descripción
             </label>
@@ -93,14 +97,39 @@ const TratamientoForm: React.FC<TratamientoFormProps> = ({ onSubmit }) => {
             {errors.precio && (
               <p className="text-red-500 text-sm mt-1">{errors.precio.message}</p>
             )}
-          </div>
+          </div>        </div>
+
+        {/* ————— Select múltiple con react-select ————— */}
+        <div className="mb-4">
+          <label className="block mb-2 text-sm font-medium">Insumos</label>
+          <Controller
+            name="insumo"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                isMulti
+                options={availableInsumos}
+                getOptionLabel={(i: insumoWithId) => i.nombre}
+                getOptionValue={(i) => i.id_insumo.toString()}
+                classNamePrefix="react-select"
+                placeholder="Selecciona uno o más insumos..."
+              />
+            )}
+          />
+          {errors.insumo && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.insumo.message}
+            </p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5"
+          className="inline-flex items-center px-5 py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
         >
-          <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          {/* ícono + texto */}
+          <svg className="me-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
               d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"

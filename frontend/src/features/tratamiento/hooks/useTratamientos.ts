@@ -5,6 +5,7 @@ import { getTratamientos } from "../api/getTratamientos";
 import { addTratamientoApi } from "../api/addTratamientoApi";
 import { deleteTratamientoAPI } from "../api/deleteTratamientoApi";
 import { editTratamientoAPI } from "../api/editTratamientoApi";
+import { addInsumoATratamientoApi } from "../api/addTratemientoInsumoApi";
 
 export type TratamientosSliceType = {
   tratamientos: TratamientoWithId[];
@@ -32,8 +33,16 @@ export default function useTratamientos(): TratamientosSliceType {
 
   const addTratamiento = async (tratamiento: Tratamiento) => {
     try {
-      await addTratamientoApi(tratamiento);
-      showNotification("success", "Tratamiento agregado correctamente");
+      const newTratamiento = await addTratamientoApi(tratamiento);
+      await Promise.all(
+      tratamiento.insumo.map((insumo) =>
+        addInsumoATratamientoApi({
+          id_tratamiento: newTratamiento.id_tratamiento, 
+          id_insumos: insumo.id_insumo,
+          cantidad: insumo.cantidad ?? 1,              
+        })
+      )
+    );      showNotification("success", "Tratamiento agregado correctamente");
       await fetchTratamientos();
     } catch (error) {
       const errorMessage = (error as Error).message || "Ocurrió un error desconocido";
