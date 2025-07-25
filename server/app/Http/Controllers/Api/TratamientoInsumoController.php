@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tratamiento;
 use Illuminate\Http\Request;
 use App\Models\TratamientoInsumo;
 use Illuminate\Support\Facades\Validator;
@@ -62,7 +63,7 @@ class TratamientoInsumoController extends Controller
         ], 200);
     }
 
-    /**
+   /**
      * @OA\Post(
      *     path="/api/tratamiento-insumo",
      *     summary="Crear una relación tratamiento-insumo",
@@ -90,8 +91,8 @@ class TratamientoInsumoController extends Controller
     public function createRelacion(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id_tratamiento' => 'required|exists:tratamiento,id_tratamiento',
-            'id_insumo'      => 'required|exists:insumo,id_insumo',
+            'id_tratamiento' => 'required|exists:tratamientos,id_tratamiento',
+            'id_insumo'      => 'required|exists:insumos,id_insumo',
             'cantidad'       => 'required|integer|min:1',
         ], [
             'id_tratamiento.required' => 'El ID del tratamiento es obligatorio.',
@@ -143,23 +144,25 @@ class TratamientoInsumoController extends Controller
      *     )
      * )
      */
-    public function getRelacionById($id)
-    {
-        $relacion = TratamientoInsumo::find($id);
+public function getRelacionById($id_tratamiento)
+{
+    // Obtiene todas las relaciones para ese tratamiento
+    $relaciones = TratamientoInsumo::where('id_tratamiento', $id_tratamiento)->get();
 
-        if (!$relacion) {
-            return response()->json([
-                'message' => 'Relación no encontrada',
-                'success' => false,
-            ], 404);
-        }
-
+    if ($relaciones->isEmpty()) {
         return response()->json([
-            'message' => 'Relación encontrada correctamente',
-            'data'    => $relacion,
-            'success' => true,
-        ], 200);
+            'message' => 'No se encontraron relaciones para el tratamiento ' . $id_tratamiento,
+            'success' => false,
+        ], 404);
     }
+
+    return response()->json([
+        'message' => 'Relaciones encontradas correctamente',
+        'data'    => $relaciones,
+        'success' => true,
+    ], 200);
+}
+
 
     /**
      * @OA\Put(
@@ -196,51 +199,57 @@ class TratamientoInsumoController extends Controller
      *     )
      * )
      */
-    public function updateRelacion(Request $request, $id)
-    {
-        $relacion = TratamientoInsumo::find($id);
+   public function updateRelacion(Request $request, $id_tratamiento)
+{
+    // 1. Validar
+    $validator = Validator::make($request->all(), [
+        'id_insumo'     => 'required|array|min:1',
+        'id_insumo.*'   => 'integer|exists:insumos,id_insumo',
+        'cantidad'       => 'required|integer|min:1',
+    ], [
+        'id_insumo.required'     => 'Debes enviar al menos un insumo.',
+        'id_insumo.array'        => 'id_insumo debe ser un arreglo de enteros.',
+        'id_insumo.*.integer'    => 'Cada id_insumo debe ser un número entero.',
+        'id_insumo.*.exists'     => 'El insumo :input no existe.',
+        'cantidad.required'       => 'La cantidad es obligatoria.',
+        'cantidad.integer'        => 'La cantidad debe ser un número entero.',
+        'cantidad.min'            => 'La cantidad debe ser al menos 1.',
+    ]);
 
-        if (!$relacion) {
-            return response()->json([
-                'message' => 'Relación no encontrada',
-                'success' => false,
-            ], 404);
-        }
-
-        $rules = [
-            'id_tratamiento' => 'sometimes|required|exists:tratamiento,id_tratamiento',
-            'id_insumo'      => 'sometimes|required|exists:insumo,id_insumo',
-            'cantidad'       => 'sometimes|required|integer|min:1',
-        ];
-
-        $messages = [
-            'id_tratamiento.required' => 'El ID del tratamiento es obligatorio.',
-            'id_tratamiento.exists'   => 'El tratamiento no existe.',
-            'id_insumo.required'      => 'El ID del insumo es obligatorio.',
-            'id_insumo.exists'        => 'El insumo no existe.',
-            'cantidad.required'       => 'La cantidad es obligatoria.',
-            'cantidad.integer'        => 'La cantidad debe ser un número entero.',
-            'cantidad.min'            => 'La cantidad debe ser al menos 1.',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Error en la validación de datos',
-                'errors'  => $validator->errors(),
-                'success' => false,
-            ], 422);
-        }
-
-        $relacion->update($validator->validated());
-
+    if ($validator->fails()) {
         return response()->json([
-            'message' => 'Relación actualizada correctamente',
-            'data'    => $relacion,
-            'success' => true,
-        ], 200);
+            'message' => 'Error en la validación de datos',
+            'errors'  => $validator->errors(),
+            'success' => false,
+        ], 422);
     }
+
+    $data    = $validator->validated();
+    $ids     = $data['id_insumo'];
+    $cantidad = $data['cantidad'];
+
+    // 2. Borra las relaciones antiguas que ya no están en el array
+    TratamientoInsumo::where('id_tratamiento', $id_tratamiento)
+        ->whereNotIn('id_insumo', $ids)
+        ->delete();
+
+    // 3. Inserta o actualiza (updateOrCreate) las relaciones que sí vienen
+    $relaciones = [];
+    foreach ($ids as $insumoId) {
+        $relaciones[] = TratamientoInsumo::updateOrCreate(
+            ['id_tratamiento' => $id_tratamiento, 'id_insumo' => $insumoId],
+            ['cantidad'      => $cantidad]
+        );
+    }
+
+    // 4. Devuelve resultado
+    return response()->json([
+        'message' => 'Relaciones sincronizadas correctamente',
+        'data'    => $relaciones,
+        'success' => true,
+    ], 200);
+}
+
 
     /**
      * @OA\Delete(
@@ -264,22 +273,20 @@ class TratamientoInsumoController extends Controller
      *     )
      * )
      */
-    public function deleteRelacion($id)
-    {
-        $relacion = TratamientoInsumo::find($id);
+public function deleteRelacion($id_tratamiento)
+{
+    $deleted = TratamientoInsumo::where('id_tratamiento', $id_tratamiento)
+                 ->delete();
 
-        if (!$relacion) {
-            return response()->json([
-                'message' => 'Relación no encontrada',
-                'success' => false,
-            ], 404);
-        }
+    return response()->json([
+        'message' => $deleted
+            ? 'Relaciones eliminadas correctamente'
+            : 'No había relaciones que eliminar',
+        'deleted' => $deleted,
+        'success' => true,
+    ], 200);
+}
 
-        $relacion->delete();
+//eliminar relacion si se borra el insumo aqui
 
-        return response()->json([
-            'message' => 'Relación eliminada correctamente',
-            'success' => true,
-        ], 200);
-    }
 }

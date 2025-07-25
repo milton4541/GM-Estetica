@@ -10,7 +10,7 @@ import TratamientoEditForm from './TratamientosEditForm';
 import useInsumos from '../insumo/hooks/useInsumos';
 
 export default function TratamientoList() {
-  const { tratamientos, addTratamiento, deleteTratamiento, editTratamiento } = useTratamientos();
+  const { tratamientos, addTratamiento, deleteTratamiento, editTratamiento} = useTratamientos();
   const {insumos} = useInsumos();
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
@@ -93,13 +93,14 @@ export default function TratamientoList() {
 
         {isOpenEdit && selectedTratamiento && (
           <Modal isOpen={isOpenEdit} onClose={() => setIsOpenEdit(false)}>
-            <TratamientoEditForm
-              tratamiento={selectedTratamiento}
-              onSubmit={(updated) => {
-                handleEdit(updated);
-                setIsOpenEdit(false);
-              }}
-            />
+          <TratamientoEditForm
+                insumos={insumos}         
+                tratamiento={selectedTratamiento}
+                onSubmit={(updated) => {
+                  handleEdit(updated);
+                  setIsOpenEdit(false);
+                }}
+              />
           </Modal>
         )}
 

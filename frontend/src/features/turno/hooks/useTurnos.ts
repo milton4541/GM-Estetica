@@ -36,6 +36,9 @@ const fetchTurnos = useCallback(async () => {
           id: String(turno.id_turno), 
           title: `${turno.paciente.nombre} ${turno.paciente.apellido}`,
           start: startDate.toISOString(),
+          backgroundColor:     turno.finalizado ? 'gray' : 'cian',
+          borderColor:         turno.finalizado ? 'gray' : 'cian',
+          textColor:           'white',
           end: new Date(
             startDate.getTime() + turno.tratamiento.duracion * 60_000
           ).toISOString(),
@@ -87,19 +90,20 @@ const addTurno = async (turno: NewTurno) => {
     }
   };
 
-  const finaliceTurno = async (id_turno: number,turno: FinalizePayload) => {
-    try {
-      await finaliceTurnoAPI(id_turno);
-      if (turno.documento) {
-        await createDoc(turno.documento, turno.id_tratamiento);
-      }
-      //await actualizarStock(turno.id_tratamiento, turno.stock_usado)
-      showNotification("success", "Cita creada correctamente");
-      await fetchTurnos();
-    } catch (err) {
-      showNotification("error", (err as Error).message);
+const finaliceTurno = async (id_turno: number,turno?: FinalizePayload       
+): Promise<void> => {
+  try {
+    await finaliceTurnoAPI(id_turno);
+
+    if (turno?.documento) {
+      await createDoc(turno.documento);
     }
-  };
+    showNotification("success", "Cita finalizada correctamente");
+    await fetchTurnos();
+  } catch (err) {
+    showNotification("error", (err as Error).message);
+  }
+};
 
 
   return { events, loading, error, refresh: fetchTurnos, addTurno, deleteTurno, updateTurno,finaliceTurno  };

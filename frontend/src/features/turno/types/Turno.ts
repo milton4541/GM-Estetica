@@ -25,7 +25,5 @@ export interface UpdateTurno {
   id_paciente: number;
 }
 export interface FinalizePayload {
-  documento: File | null;
-  stock_usado: number;
-  id_tratamiento: number
+  documento?: File | null;
 }

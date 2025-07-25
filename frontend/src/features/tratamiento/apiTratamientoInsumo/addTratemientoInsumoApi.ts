@@ -7,7 +7,6 @@ export const addInsumoATratamientoApi = async (
   detalle: DetalleTratamientoInsumo
 ): Promise<DetalleTratamientoInsumo> => {
   try {
-    console.log("desde trat insu  ", detalle)
     const token = localStorage.getItem("authToken");
     const response = await api.post(
       API_URL_ADD_INSUMO,

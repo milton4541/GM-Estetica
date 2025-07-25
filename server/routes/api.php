@@ -76,7 +76,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get(    'tratamiento-insumo/{id}',    'getRelacionById');
         Route::post(   'tratamiento-insumo',         'createRelacion');
         Route::patch(  'tratamiento-insumo/{id}',    'updateRelacion');
-        Route::delete( 'tratamiento-insumo/{id}',    'deleteRelacion');
+        Route::delete( 'tratamiento-insumo/{id_tratamiento}',    'deleteRelacion');
     });
 
     Route::controller(ReporteAdministrativoController::class)->group(function () {

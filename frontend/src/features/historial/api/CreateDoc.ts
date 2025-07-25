@@ -3,7 +3,10 @@ import api from "../../../utils/axios";
 
 const API_URL = "/documentos";
 
-export async function createDoc(archivo: File, tratamientoId: number): Promise<void> {
+export async function createDoc(
+  archivo: File,
+  historialId?: number   // ← ahora opcional
+): Promise<void> {
   if (!archivo) {
     throw new Error("Debe proporcionar un archivo.");
   }
@@ -13,15 +16,22 @@ export async function createDoc(archivo: File, tratamientoId: number): Promise<v
 
   const form = new FormData();
   form.append("archivo", archivo);
-  form.append("tratamiento_id", String(tratamientoId));
+
+  // Sólo añadimos el ID si fue proporcionado
+  if (historialId !== undefined) {
+    form.append("historial_id", String(historialId));
+  }
 
   try {
     const token = localStorage.getItem("authToken");
     await api.post(API_URL, form, {
       headers: {
-        "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
       },
+      transformRequest: (data, headers) => {      
+      delete headers["Content-Type"];
+      return data;
+    },
     });
   } catch (error) {
     console.error("Error subiendo documento:", error);

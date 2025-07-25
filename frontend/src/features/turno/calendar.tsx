@@ -11,7 +11,7 @@ import type { Turno } from "./types/Turno";
 import DetailModal from "./DetailModal";
 
 const CalendarPage = () => {
-  const { events, loading, addTurno,deleteTurno, updateTurno,finaliceTurno } = useTurnos();
+  const { events, loading, refresh, addTurno,deleteTurno, updateTurno,finaliceTurno } = useTurnos();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -24,7 +24,6 @@ const CalendarPage = () => {
   };
 
   const handleEventClick = (arg: EventClickArg) => {
-  // Si usaste extendedProps:
   const turno = arg.event.extendedProps.rawTurno as Turno;
   setSelectedTurno(turno);
   setDetailOpen(true);
@@ -82,6 +81,7 @@ const CalendarPage = () => {
     onClose={() => {
       setDetailOpen(false);
       setSelectedTurno(null);
+      refresh(); 
     }}
     onSave={updateTurno}
     onDelete={deleteTurno}

@@ -11,6 +11,6 @@ export type TratamientoWithId = Tratamiento & {id_tratamiento: number}
 
 export type DetalleTratamientoInsumo = {
   id_tratamiento: number;
-  id_insumos: [number];
+  id_insumo: number;
   cantidad: number;
 };

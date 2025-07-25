@@ -358,7 +358,7 @@
                                                         "type": "string",
                                                         "example": "http://localhost/archivos/uuid.pdf"
                                                     },
-                                                    "tratamiento_id": {
+                                                    "historial_id": {
                                                         "type": "integer",
                                                         "example": 3
                                                     },
@@ -404,14 +404,14 @@
                             "schema": {
                                 "required": [
                                     "archivo",
-                                    "tratamiento_id"
+                                    "historial_id"
                                 ],
                                 "properties": {
                                     "archivo": {
                                         "type": "string",
                                         "format": "binary"
                                     },
-                                    "tratamiento_id": {
+                                    "historial_id": {
                                         "type": "integer",
                                         "example": 3
                                     }
@@ -446,7 +446,7 @@
                                                     "type": "string",
                                                     "example": "http://localhost/archivos/uuid.pdf"
                                                 },
-                                                "tratamiento_id": {
+                                                "historial_id": {
                                                     "type": "integer",
                                                     "example": 3
                                                 },

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use App\Models\Documentos;
+use App\Models\Historial;
 
 class DocumentoController extends Controller
 {
@@ -93,33 +94,47 @@ class DocumentoController extends Controller
      *     )
      * )
      */
-    public function createDoc(Request $request): JsonResponse
-    {
-        $request->validate([
-            'archivo'       => 'required|file|max:5120',
-            'historial_id'  => 'required|integer|exists:historial,id_historial',
-        ]);
+public function createDoc(Request $request): JsonResponse
+{
+    $request->validate([
+        'archivo'      => 'required|file|max:5120',
+        'historial_id' => 'nullable|integer|exists:historial,id_historial',
+    ]);
 
-        $file       = $request->file('archivo');
-        $original   = $file->getClientOriginalName();
-        $extension  = $file->getClientOriginalExtension();
-        $filename   = Str::uuid() . '.' . $extension;
-
-        $file->move(public_path('archivos'), $filename);
-
-        $url = url("archivos/{$filename}");
-
-        $doc = Documentos::create([
-            'nombre_doc'     => $original,
-            'url'            => $url,
-            'historial_id'   => $request->historial_id,
-        ]);
-
-        return response()->json([
-            'message' => 'Archivo subido correctamente',
-            'doc'     => $doc,
-        ], 201);
+    // Si no viene historial_id, tomamos el último creado
+    $historialId = $request->input('historial_id');
+    if (! $historialId) {
+        $last = Historial::latest('id_historial')->first();
+        if (! $last) {
+            return response()->json([
+                'message' => 'No hay historial previo para asignar el documento',
+                'success' => false,
+            ], 400);
+        }
+        $historialId = $last->id_historial;
     }
+
+    $file      = $request->file('archivo');
+    $original  = $file->getClientOriginalName();
+    $extension = $file->getClientOriginalExtension();
+    $filename  = Str::uuid() . '.' . $extension;
+
+    $file->move(public_path('archivos'), $filename);
+
+    $url = url("archivos/{$filename}");
+
+    $doc = Documentos::create([
+        'nombre_doc'    => $original,
+        'url'           => $url,
+        'historial_id'  => $historialId,
+    ]);
+
+    return response()->json([
+        'message' => 'Archivo subido correctamente',
+        'doc'     => $doc,
+        'success' => true,
+    ], 201);
+}
 
     /**
      * @OA\Get(

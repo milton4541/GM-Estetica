@@ -1,41 +1,28 @@
-import { useState, useEffect, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, IconButton, Select, MenuItem, Button, Collapse, TextField
 } from '@mui/material'
 import { ExpandMore, ExpandLess } from '@mui/icons-material'
 import { Autocomplete } from '@mui/material'
-import { DocumentosPorHistorial } from './DocumentosPorHistorial'
+import useTratamientos from '../tratamiento/hooks/useTratamientos'
+import usePacients from '../paciente/hooks/usePacient'
+import useHistorial from './hooks/useHistorial'
 
 export function HistorialTratamientos() {
-  const [historial, setHistorial] = useState([])
-  const [pacientes, setPacientes] = useState([])
-  const [tratamientos, setTratamientos] = useState([])
 
-  const [filterType, setFilterType] = useState('')        // 'paciente' | 'tratamiento' | ''
-  const [filterValue, setFilterValue] = useState(null)    // objeto paciente o tratamiento
+  const {tratamientos} = useTratamientos();
+  const {pacient} = usePacients();
+  const {historial} = useHistorial()
 
-  const [openRow, setOpenRow] = useState(null)            // id de historial expandido
+  const [filterType, setFilterType] = useState('')       
+  const [filterValue, setFilterValue] = useState(null)    
 
-  // Carga inicial
-  useEffect(() => {
-    fetch('/api/historial')
-      .then(r => r.json())
-      .then(data => setHistorial(data))
+  const [openRow, setOpenRow] = useState(null)            
 
-    fetch('/api/pacientes')
-      .then(r => r.json())
-      .then(data => setPacientes(data))
-
-    fetch('/api/tratamientos')
-      .then(r => r.json())
-      .then(data => setTratamientos(data))
-  }, [])
-
-  // Filtro: si hay filterType y filterValue, lo aplicamos
   const filtered = historial.filter(item => {
     if (filterType === 'paciente') {
-      return item.paciente.id_paciente === filterValue?.id_paciente
+      return item.paciente.id_paciente === filterValue?.
     }
     if (filterType === 'tratamiento') {
       return item.tratamiento.id_tratamiento === filterValue?.id_tratamiento
@@ -65,7 +52,7 @@ export function HistorialTratamientos() {
 
         {filterType === 'paciente' && (
           <Autocomplete
-            options={pacientes}
+            options={pacient}
             getOptionLabel={p => `${p.nombre} ${p.apellido}`}
             value={filterValue}
             onChange={(e, newVal) => setFilterValue(newVal)}

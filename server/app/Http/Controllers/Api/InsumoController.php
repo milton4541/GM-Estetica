@@ -382,47 +382,67 @@ class InsumoController extends Controller
  *     )
  * )
  */
-    public function actualizarStock(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'id_tratamiento' => 'required|exists:tratamiento,id_tratamiento',
-            'cantidad' => 'required|integer|min:1',
-        ]);
+   public function actualizarStock(Request $request): JsonResponse
+{
+    // 1. Validación de entrada
+    $validator = Validator::make($request->all(), [
+        'id_tratamiento' => 'required|exists:tratamientos,id_tratamiento',
+        'id_insumo'      => 'required|exists:insumos,id_insumo',
+        'cantidad'       => 'required|integer|min:1',  // cuántos tratamientos aplicamos
+    ], [
+        'id_tratamiento.required' => 'El ID del tratamiento es obligatorio.',
+        'id_tratamiento.exists'   => 'El tratamiento no existe.',
+        'id_insumo.required'      => 'El ID del insumo es obligatorio.',
+        'id_insumo.exists'        => 'El insumo no existe.',
+        'cantidad.required'       => 'La cantidad de tratamientos es obligatoria.',
+        'cantidad.integer'        => 'La cantidad debe ser un número entero.',
+        'cantidad.min'            => 'La cantidad debe ser al menos 1.',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error en la validación de datos',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $idTratamiento = $request->id_tratamiento;
-        $cantidadTratamientos = $request->cantidad;
-
-        $relaciones = TratamientoInsumo::where('id_tratamiento', $idTratamiento)->get();
-
-        if ($relaciones->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No se encontraron insumos relacionados al tratamiento'
-            ], 404);
-        }
-
-        foreach ($relaciones as $rel) {
-            $insumo = Insumo::find($rel->id_insumo);
-            if ($insumo) {
-                $descuento = $rel->cantidad * $cantidadTratamientos;
-                $insumo->cantidad = max(0, $insumo->cantidad - $descuento);
-                $insumo->save();
-            }
-        }
-
+    if ($validator->fails()) {
         return response()->json([
-            'success' => true,
-            'message' => 'Stock actualizado correctamente'
-        ], 200);
+            'success' => false,
+            'message' => 'Error en la validación de datos',
+            'errors'  => $validator->errors(),
+        ], 422);
     }
+
+    $data            = $validator->validated();
+    $idTratamiento   = $data['id_tratamiento'];
+    $idInsumo        = $data['id_insumo'];
+    $cantidad        = $data['cantidad'];
+
+    // 2. Buscamos la relación específica
+    $relacion = TratamientoInsumo::where('id_tratamiento', $idTratamiento)
+        ->where('id_insumo', $idInsumo)
+        ->first();
+
+    if (! $relacion) {
+        return response()->json([
+            'success' => false,
+            'message' => "No existe relación tratamiento‐insumo para tratamiento {$idTratamiento} e insumo {$idInsumo}",
+        ], 404);
+    }
+
+    $insumo = Insumo::find($idInsumo);
+    $stockAnterior = $insumo->cantidad;
+    $insumo->cantidad = ( $stockAnterior - $cantidad);
+    $insumo->save();
+
+    // 4. Respuesta
+    return response()->json([
+        'success' => true,
+        'message' => 'Stock del insumo actualizado correctamente',
+        'data'    => [
+            'id_insumo'       => $idInsumo,
+            'stock_anterior'  => $stockAnterior,
+            'stock_actual'    => $insumo->cantidad,
+            'descontado'      => $cantidad,
+        ],
+    ], 200);
+
+}
+
 
  /**
  * @OA\Put(
@@ -488,7 +508,7 @@ class InsumoController extends Controller
     public function reestock(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'id_insumo' => 'required|exists:insumo,id_insumo',
+            'id_insumo' => 'required|exists:insumos,id_insumo',
             'cantidad' => 'required|integer|min:1',
         ]);
 
