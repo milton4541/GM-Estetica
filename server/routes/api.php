@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\TurnoController;
 use App\Http\Controllers\Api\TratamientoInsumoController;
 use App\Http\Controllers\Api\ReporteAdministrativoController;
 
+
 //rutas publicas
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
@@ -81,9 +82,13 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     Route::controller(ReporteAdministrativoController::class)->group(function () {
         Route::get('reportes/ingresos-totales', 'ingresosTotales');
+        Route::get('reportes/ingresos-totales-pdf', 'exportarIngresosTotalesPdf');
         Route::get('reportes/ingresos-mensuales', 'ingresosPorMes');
+        Route::get('reportes/ingresos-mensuales-pdf', 'exportarIngresosMensualesPdf');
         Route::get('reportes/rendimiento-tratamientos', 'rendimientoPorTratamiento');
+        Route::get('reportes/rendimiento-tratamientos-pdf', 'exportarRendimientoTratamientosPdf');
     });
+
 
     Route::get('/jwt-check', function () {
     return response()->json([

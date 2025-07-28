@@ -1998,6 +1998,28 @@
                 ]
             }
         },
+        "/api/reportes/ingresos-totales-pdf": {
+            "get": {
+                "tags": [
+                    "Reportes administrativos"
+                ],
+                "summary": "Generar y descargar reporte PDF de ingresos totales",
+                "operationId": "4d62caff6a9096ccef836cde1fe14f42",
+                "responses": {
+                    "200": {
+                        "description": "Archivo PDF descargado correctamente",
+                        "content": {
+                            "application/pdf": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/reportes/ingresos-mensuales": {
             "get": {
                 "tags": [
@@ -2024,6 +2046,28 @@
                 ]
             }
         },
+        "/api/reportes/ingresos-mensuales-pdf": {
+            "get": {
+                "tags": [
+                    "Reportes administrativos"
+                ],
+                "summary": "Generar y descargar reporte PDF de ingresos mensuales",
+                "operationId": "fc94d5c8160079b7e114125371c5b7a8",
+                "responses": {
+                    "200": {
+                        "description": "Archivo PDF descargado correctamente",
+                        "content": {
+                            "application/pdf": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/reportes/rendimiento-tratamientos": {
             "get": {
                 "tags": [
@@ -2040,6 +2084,28 @@
                                     "$ref": "#/components/schemas/RendimientoTratamientoResponse"
                                 }
                             }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/reportes/rendimiento-tratamientos-pdf": {
+            "get": {
+                "tags": [
+                    "Reportes administrativos"
+                ],
+                "summary": "Generar y descargar reporte PDF de rendimiento por tratamiento",
+                "operationId": "6f087db610cf48461c29b177cc776b6a",
+                "responses": {
+                    "200": {
+                        "description": "Archivo PDF descargado correctamente",
+                        "content": {
+                            "application/pdf": {}
                         }
                     }
                 },
