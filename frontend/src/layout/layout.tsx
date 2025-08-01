@@ -10,6 +10,7 @@ import {
   faHandHoldingMedical,
   faHistory,
   faChartBar,
+  faFileInvoiceDollar,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function Layout() {
@@ -52,6 +53,13 @@ export default function Layout() {
               <Options
                 icon={<FontAwesomeIcon icon={faHistory} size="lg" />}
                 label="Historial"
+              />
+            </Link>
+
+            <Link to="/facturas" className="flex items-center">
+              <Options
+                icon={<FontAwesomeIcon icon={faFileInvoiceDollar} size="lg" />}
+                label="Facturas"
               />
             </Link>
 

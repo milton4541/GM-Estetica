@@ -201,14 +201,20 @@ public function createDoc(Request $request): JsonResponse
      *     )
      * )
      */
-    public function destroy(int $doc_id): JsonResponse
+    public function deleteFromBD(int $doc_id): JsonResponse
     {
         $doc = Documentos::findOrFail($doc_id);
-        $doc->eliminado = true;
-        $doc->save();
+
+        $filePath = public_path($doc->url);
+
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+        }
+
+        $doc->delete();
 
         return response()->json([
-            'message' => 'Documento marcado como eliminado (baja lógica).'
+            'message' => 'Documento eliminado completamente.'
         ], 200);
     }
 }

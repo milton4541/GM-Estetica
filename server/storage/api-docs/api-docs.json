@@ -521,7 +521,7 @@
                     "Documentos"
                 ],
                 "summary": "Eliminar lógicamente un documento",
-                "operationId": "15731a5fb7a84a89e9c4b43b9018c6b6",
+                "operationId": "6d71c20eaa4335d39b69182d775926ef",
                 "parameters": [
                     {
                         "name": "doc_id",

@@ -69,7 +69,7 @@ class FacturaController extends Controller
      */
     public function getFacturas(): JsonResponse
     {
-        $facturas = Factura::with(['paciente', 'pagos'])->get();
+        $facturas = Factura::with(['paciente', 'tratamiento'])->get();
 
         return response()->json([
             'success' => true,
@@ -77,7 +77,13 @@ class FacturaController extends Controller
             'message' => 'Listado de facturas obtenido exitosamente'
         ], 200);
     }
-
+    public function enviarMail($id)
+    {
+        $factura = Factura::with(['paciente', 'tratamiento'])->findOrFail($id);
+        $email = $factura->paciente->email;
+        Mail::to($email)->send(new FacturaMail($factura));
+        return; 
+    }
     /**
      * @OA\Post(
      *     path="/api/facturas",
@@ -127,7 +133,7 @@ class FacturaController extends Controller
         }
 
         $factura = Factura::create($validator->validated());
-        enviarMail($factura -> factura_id);
+        $this->enviarMail($factura -> factura_id);
         return response()->json([
             'success' => true,
             'data'    => $factura,
@@ -293,22 +299,4 @@ class FacturaController extends Controller
         ], 200);
     }
 
-
-    public function enviarMail($id)
-    {
-        // Recuperar factura con relaciones
-        $factura = Factura::with(['paciente', 'tratamiento'])->findOrFail($id);
-        //dd($factura->paciente);
-        // Email del paciente (asegúrate de que el modelo Paciente tenga el campo 'email')
-        $email = $factura->paciente->email;
-
-        // Enviar correo
-        Mail::to($email)->send(new FacturaMail($factura));
-
-        // Opcional: redirigir con mensaje de éxito
-        return response()->json([
-            'status'  => 'success',
-            'message' => "Factura enviada correctamente a {$email}"
-        ], 200);    
-    }
 }

@@ -59,10 +59,10 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     Route::controller(FacturaController::class)->group(function () {
         Route::get(    'facturas',        'getFacturas');
-        Route::get(    'factura/{id}',    'getFacturaById');
-        Route::post(   'factura',         'createFactura');
-        Route::patch(  'factura/{id}',    'updateFactura');
-        Route::delete( 'factura/{id}',    'deleteFactura');
+        Route::get(    'facturas/{id}',    'getFacturaById');
+        Route::post(   'facturas',         'createFactura');
+        Route::patch(  'facturas/{id}',    'updateFactura');
+        Route::delete( 'facturas/{id}',    'deleteFactura');
     });
     
     Route::controller(HistorialController::class)->group(function () {
@@ -99,7 +99,9 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     Route::controller(DocumentoController::class)->group(function(){
         Route::get('documentos', 'getDoc');
+        Route::get('documentos/{id}', 'download');
         Route::post('documentos', 'createDoc');
+        Route::delete('documentos/{id}', 'deleteFromBD'); 
     });
     
 

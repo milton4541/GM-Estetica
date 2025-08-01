@@ -1,47 +1,67 @@
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useEffect } from 'react'
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, IconButton, Select, MenuItem, Button, Collapse, TextField
 } from '@mui/material'
-import { ExpandMore, ExpandLess } from '@mui/icons-material'
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { Autocomplete } from '@mui/material'
 import useTratamientos from '../tratamiento/hooks/useTratamientos'
 import usePacients from '../paciente/hooks/usePacient'
 import useHistorial from './hooks/useHistorial'
+import type { PacientWithId } from '../paciente/types/pacient'
+import type { TratamientoWithId } from '../tratamiento/types/tratamiento'
+import { DocumentosPorHistorial } from './DocumentosPorHistorial'
+import ModalRegistro from '../factura/FacturaModal';
+import useFactura from '../factura/hooks/useFactura';
 
 export function HistorialTratamientos() {
+  const { tratamientos } = useTratamientos()
+  const { pacient }      = usePacients()
 
-  const {tratamientos} = useTratamientos();
-  const {pacient} = usePacients();
-  const {historial} = useHistorial()
+  const [filterType, setFilterType] = useState<'paciente'|'tratamiento'|''>('')
 
-  const [filterType, setFilterType] = useState('')       
-  const [filterValue, setFilterValue] = useState(null)    
+  const [filterPaciente, setFilterPaciente]       = useState<PacientWithId|null>(null)
+  const [filterTratamiento, setFilterTratamiento] = useState<TratamientoWithId|null>(null)
+  const [openRow,setOpenRow] = useState<number|null>(null)
+  const [showFacturaModal, setShowFacturaModal] = useState(false);
+  const [facturaData, setFacturaData] = useState<{
+    id_paciente: number;
+    id_tratamiento: number;
+    importe: number;
+  } | null>(null);
 
-  const [openRow, setOpenRow] = useState(null)            
+  const { historial,fetchByPaciente,fetchByTratamiento,fetchHistorial} = useHistorial()
+  const {createFactura} = useFactura()
+  useEffect(() => {
+  if (filterType === 'paciente' && filterPaciente) {
+    fetchByPaciente(filterPaciente.id_paciente)
+  }
+  else if (filterType === 'tratamiento' && filterTratamiento) {
+    fetchByTratamiento(filterTratamiento.id_tratamiento)
+  }
+  else {
+    fetchHistorial()
+  }
+}, [filterType, filterPaciente, filterTratamiento])
 
-  const filtered = historial.filter(item => {
-    if (filterType === 'paciente') {
-      return item.paciente.id_paciente === filterValue?.
-    }
-    if (filterType === 'tratamiento') {
-      return item.tratamiento.id_tratamiento === filterValue?.id_tratamiento
-    }
-    return true
-  })
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">Historial de Tratamientos</h2>
 
-      {/* Controles de filtrado */}
+      {/* FILTROS */}
       <div className="flex gap-4 mb-6 items-end">
         <Select
           value={filterType}
           displayEmpty
           onChange={e => {
-            setFilterType(e.target.value)
-            setFilterValue(null)
+            const ft = e.target.value
+            setFilterType(ft)
+            // Al cambiar de tipo, limpiamos ambos estados
+            setFilterPaciente(null)
+            setFilterTratamiento(null)
           }}
           sx={{ minWidth: 160 }}
         >
@@ -54,8 +74,8 @@ export function HistorialTratamientos() {
           <Autocomplete
             options={pacient}
             getOptionLabel={p => `${p.nombre} ${p.apellido}`}
-            value={filterValue}
-            onChange={(e, newVal) => setFilterValue(newVal)}
+            value={filterPaciente}
+            onChange={(_, newVal) => setFilterPaciente(newVal)}
             sx={{ width: 240 }}
             renderInput={params => <TextField {...params} label="Selecciona paciente" />}
           />
@@ -64,20 +84,26 @@ export function HistorialTratamientos() {
         {filterType === 'tratamiento' && (
           <Autocomplete
             options={tratamientos}
-            getOptionLabel={t => t.nombre}
-            value={filterValue}
-            onChange={(e, newVal) => setFilterValue(newVal)}
+            getOptionLabel={t => t.descripcion}
+            value={filterTratamiento}
+            onChange={(_, newVal) => setFilterTratamiento(newVal)}
             sx={{ width: 240 }}
             renderInput={params => <TextField {...params} label="Selecciona tratamiento" />}
           />
         )}
 
-        <Button onClick={() => { setFilterType(''); setFilterValue(null) }}>
+        <Button
+          onClick={() => {
+            setFilterType('')
+            setFilterPaciente(null)
+            setFilterTratamiento(null)
+          }}
+        >
           Limpiar filtro
         </Button>
       </div>
 
-      {/* Tabla principal */}
+      {/* TABLA */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -88,31 +114,49 @@ export function HistorialTratamientos() {
               <TableCell sx={{ fontWeight: 'bold' }}>Documentos</TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
-            {filtered.map(row => (
-              <Fragment key={row.id}>
+            {historial.map(row => (
+              <Fragment key={row.id_historial}>
                 <TableRow hover>
-                  <TableCell>{`${row.paciente.nombre} ${row.paciente.apellido}`}</TableCell>
-                  <TableCell>{row.tratamiento.nombre}</TableCell>
+                  <TableCell>
+                  {row.paciente.nombre} {row.paciente.apellido}
+                  </TableCell>
+                  <TableCell>
+                    {row.tratamiento.descripcion}
+                  </TableCell>
                   <TableCell>
                     {new Date(row.created_at).toLocaleDateString('es-AR')}
                   </TableCell>
                   <TableCell className="text-center">
+                  <div className="flex justify-center gap-1">
                     <IconButton
-                      onClick={() => setOpenRow(openRow === row.id ? null : row.id)}
+                      onClick={() =>
+                        setOpenRow(openRow === row.id_historial ? null : row.id_historial)
+                      }
                     >
-                      {openRow === row.id ? <ExpandLess/> : <ExpandMore/>}
+                      {openRow === row.id_historial ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                     </IconButton>
-                  </TableCell>
+                    <IconButton
+                      onClick={() => {
+                        setFacturaData({
+                          id_paciente: row.paciente.id_paciente,
+                          id_tratamiento: row.tratamiento.id_tratamiento,
+                          importe: row.tratamiento.precio,
+                        });
+                        setShowFacturaModal(true);
+                      }}
+                    >
+                      <ReceiptIcon />
+                    </IconButton>
+                  </div>
+                </TableCell>
                 </TableRow>
 
-                {/* Fila expandible con lista de documentos */}
                 <TableRow>
                   <TableCell style={{ padding: 0 }} colSpan={4}>
-                    <Collapse in={openRow === row.id} timeout="auto" unmountOnExit>
+                    <Collapse in={openRow === row.id_historial} timeout="auto" unmountOnExit>
                       <div className="p-4">
-                        <DocumentosPorHistorial historialId={row.id} />
+                        <DocumentosPorHistorial historialId={row.id_historial} />
                       </div>
                     </Collapse>
                   </TableCell>
@@ -122,6 +166,19 @@ export function HistorialTratamientos() {
           </TableBody>
         </Table>
       </TableContainer>
+      {facturaData && (
+      <ModalRegistro
+        isOpen={showFacturaModal}
+        onClose={() => setShowFacturaModal(false)}
+        idPaciente={facturaData.id_paciente}
+        idTratamiento={facturaData.id_tratamiento}
+        importe={facturaData.importe}
+        onSubmit={(data) => {
+          createFactura(data)
+        }}
+      />
+      )}
+
     </div>
   )
 }
