@@ -32,89 +32,92 @@ export default function InsumoList() {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Lista de Insumos</h2>
-      <button
-        onClick={() => setIsOpenAdd(true)}
-        className="bg-gray-500 hover:bg-gray-700 text-black font-bold py-2 px-4 rounded flex items-center gap-2 mb-6"
-      >
-        Agregar Insumo <FaPlus />
-      </button>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Lista de Insumos</h2>
+        <button
+          onClick={() => setIsOpenAdd(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mb-4"
+        >
+          Agregar Insumo <FaPlus />
+        </button>
 
-      <Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
-        <InsumoForm onSubmit={handleAdd} />
-      </Modal>
+        <Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
+          <InsumoForm onSubmit={handleAdd} />
+        </Modal>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead className="text-center uppercase">
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Componentes</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Precio</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Cantidad</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Cantidad Mínima</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Fecha Expiración</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Editar</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Eliminar</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="text-center">
-            {insumos.map((row) => (
-              <TableRow key={row.id_insumo}>
-                <TableCell>{row.componentes}</TableCell>
-                <TableCell>{row.nombre}</TableCell>
-                <TableCell>{row.precio_insumo.toFixed(2)}</TableCell>
-                <TableCell>{row.cantidad}</TableCell>
-                <TableCell>{row.cantidad_min}</TableCell>
-                <TableCell>{new Date(row.fecha_expiracion).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => {
-                      setSelectedInsumo(row);
-                      setIsOpenEdit(true);
-                    }}
-                    className="text-blue-500 hover:text-blue-700 transition-all"
-                  >
-                    <FaEdit />
-                  </IconButton>
-                </TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => {
-                      setSelectedInsumo(row);
-                      setIsOpenDelete(true);
-                    }}
-                    className="text-red-500 hover:text-red-700 transition-all"
-                  >
-                    <FaTrash />
-                  </IconButton>
-                </TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead className="bg-gray-50 uppercase">
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Componentes</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Precio</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Cantidad</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Cantidad Mínima</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Fecha Expiración</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Editar</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Eliminar</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {insumos.map((row) => (
+                <TableRow key={row.id_insumo}>
+                  {/* Aquí aplicamos el estilo para las celdas */}
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.componentes}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.nombre}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.precio_insumo.toFixed(2)}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.cantidad}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.cantidad_min}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{new Date(row.fecha_expiracion).toLocaleDateString()}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    <IconButton
+                      onClick={() => {
+                        setSelectedInsumo(row);
+                        setIsOpenEdit(true);
+                      }}
+                      className="text-blue-600 hover:text-blue-900 transition-all"
+                    >
+                      <FaEdit />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    <IconButton
+                      onClick={() => {
+                        setSelectedInsumo(row);
+                        setIsOpenDelete(true);
+                      }}
+                      className="text-red-600 hover:text-red-900 transition-all"
+                    >
+                      <FaTrash />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
 
-        {isOpenEdit && selectedInsumo && (
-          <Modal isOpen={isOpenEdit} onClose={() => setIsOpenEdit(false)}>
-            <InsumoEditForm
-              insumo={selectedInsumo}
-              onSubmit={(updated) => {
-                handleEdit(updated);
-                setIsOpenEdit(false);
-              }}
-            />
-          </Modal>
-        )}
-
-        {isOpenDelete && selectedInsumo && (
-          <ConfirmAction
-            onConfirm={() => {
-              handleDelete(selectedInsumo.id_insumo);
+      {isOpenEdit && selectedInsumo && (
+        <Modal isOpen={isOpenEdit} onClose={() => setIsOpenEdit(false)}>
+          <InsumoEditForm
+            insumo={selectedInsumo}
+            onSubmit={(updated) => {
+              handleEdit(updated);
+              setIsOpenEdit(false);
             }}
-            onCancel={() => setIsOpenDelete(false)}
           />
-        )}
-      </TableContainer>
+        </Modal>
+      )}
+
+      {isOpenDelete && selectedInsumo && (
+        <ConfirmAction
+          onConfirm={() => {
+            handleDelete(selectedInsumo.id_insumo);
+          }}
+          onCancel={() => setIsOpenDelete(false)}
+        />
+      )}
     </div>
   );
 }

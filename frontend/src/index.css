@@ -1,3 +1,120 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Estilo para todos los botones de FullCalendar */
+.fc .fc-button {
+  background-color: #1e40af; /* El color de bg-blue-800 */
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Efecto de hover para los botones */
+.fc .fc-button:hover {
+  background-color: #1d4ed8; /* Un azul ligeramente más claro para el hover (bg-blue-700) */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para el título del calendario (la fecha) */
+.fc .fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Estilo para los botones que ya están activos (ej. el que muestra la vista actual) */
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #1d4ed8; /* También usamos bg-blue-700 para el estado activo */
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para los botones del encabezado */
+.fc .fc-button {
+  background-color: #1e40af; /* bg-blue-800 */
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.fc .fc-button:hover {
+  background-color: #1d4ed8; /* bg-blue-700 */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #1d4ed8; /* bg-blue-700 para el estado activo */
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Título del calendario (la fecha) */
+.fc .fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Cabeceras de los días de la semana */
+.fc .fc-col-header-cell-cushion {
+  color: #374151; /* Un gris oscuro para mayor legibilidad */
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Bordes de la tabla más limpios */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #e5e7eb; /* Gris muy claro */
+}
+
+/* Estilo para los eventos */
+.fc-event {
+  background-color: #1e40af; /* bg-blue-800 para que se vea con el mismo color de la barra lateral */
+  color: #ffffff; /* Texto blanco para un contraste perfecto */
+  border: none;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para los eventos de todo el día */
+.fc-event-allday {
+  background-color: #4b5563;
+  color: #f3f4f6;
+  border-left: 4px solid #9ca3af;
+}
+
+/* Resaltar los fines de semana (sábado y domingo) */
+.fc .fc-day-sat, .fc .fc-day-sun {
+  background-color: #f9fafb; /* Un gris claro para el fin de semana */
+}
+
+/* Permite que los eventos de FullCalendar usen múltiples líneas de texto */
+.fc-event-main-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  white-space: normal;
+}
+
+/* Permite que los eventos de FullCalendar usen múltiples líneas de texto */
+.fc-event-main-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  white-space: normal;
+}

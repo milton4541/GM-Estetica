@@ -12,15 +12,37 @@ type Props = {
   addTurno: (t: NewTurno) => Promise<void>;
 };
 
+// Estilos personalizados para react-select
+const customStyles = {
+  control: (provided: any, state: { isFocused: any }) => ({
+    ...provided,
+    backgroundColor: '#ffffff',
+    borderColor: state.isFocused ? '#2563eb' : '#d1d5db',
+    boxShadow: state.isFocused ? '0 0 0 1px #2563eb' : 'none',
+    '&:hover': {
+      borderColor: '#9ca3af',
+    },
+    borderRadius: '8px',
+  }),
+  option: (provided: any, state: { isSelected: any; isFocused: any }) => ({
+    ...provided,
+    backgroundColor: state.isSelected ? '#1e40af' : state.isFocused ? '#eff6ff' : null,
+    color: state.isSelected ? 'white' : '#1f2937',
+  }),
+  multiValue: (provided: any) => ({
+    ...provided,
+    backgroundColor: '#e5e7eb',
+    borderRadius: '4px',
+  }),
+};
+
 export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
   const [clientId, setClientId] = useState<number | null>(null);
   const [selectedTratamientos, setSelectedTratamientos] = useState<number[]>([]);
 
-  // 1. Traemos los datos y funciones de los hooks
   const { pacient } = usePacients();
   const { tratamientos } = useTratamientos();
 
-  // 2. Preparamos opciones para los selects
   const clientOptions = pacient.map((p) => ({
     value: p.id_paciente,
     label: `${p.nombre} ${p.apellido}`,
@@ -30,7 +52,6 @@ export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
     label: t.descripcion,
   }));
 
-  // 3. Formateo de fecha y hora para la API
   const formatDateAPI = (iso: string) => {
     const d = new Date(iso);
     const dd = String(d.getDate()).padStart(2, "0");
@@ -61,27 +82,28 @@ export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-<div className="bg-white p-6 rounded-lg w-1/3 h-[40vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Crear Cita</h2>
+      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Crear Cita</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium">Fecha:</label>
-            <p>{formatDateAPI(selectedDate)} &nbsp; {formatTimeAPI(selectedDate)}</p>
+            <label className="block text-sm font-medium text-gray-700">Fecha y Hora:</label>
+            <p className="mt-1 text-gray-900">{formatDateAPI(selectedDate)} &nbsp; {formatTimeAPI(selectedDate)}</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Paciente:</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Paciente:</label>
             <Select
               options={clientOptions}
               value={clientOptions.find((opt) => opt.value === clientId) || null}
               onChange={(opt) => setClientId(opt ? opt.value : null)}
               placeholder="Selecciona un paciente..."
               isSearchable
+              styles={customStyles}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Tratamientos:</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Tratamientos:</label>
             <Select
               options={tratamientoOptions}
               isMulti
@@ -90,17 +112,22 @@ export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
                 setSelectedTratamientos(opts.map((o) => o.value))
               }
               placeholder="Selecciona tratamientos..."
+              styles={customStyles}
             />
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
+          <div className="flex justify-end space-x-2 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border rounded-lg text-gray-700 bg-white hover:bg-gray-100 transition-colors"
+            >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={!clientId || selectedTratamientos.length === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+              className="px-4 py-2 text-white rounded-lg bg-blue-800 hover:bg-blue-700 disabled:opacity-50 disabled:bg-gray-400 transition-colors"
             >
               Guardar Cita
             </button>

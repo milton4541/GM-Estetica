@@ -13,6 +13,9 @@ export interface CalendarEvent {
   title: string;
   start: string;
   end: string;
+  backgroundColor?: string;
+  borderColor?: string;
+  textColor?: string;
   extendedProps?: {
     rawTurno: Turno;
   };
@@ -23,7 +26,7 @@ export default function useTurnos() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-const fetchTurnos = useCallback(async () => {
+  const fetchTurnos = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -32,17 +35,20 @@ const fetchTurnos = useCallback(async () => {
         const isoStart = `${turno.fecha}T${turno.hora}:00`;
         const startDate = new Date(isoStart);
 
+        // AHORA SOLO ACCEDEMOS A UN TRATAMIENTO Y SU DURACIÓN
+        const totalDuration = turno.tratamiento ? turno.tratamiento.duracion : 0;
+
         return {
-          id: String(turno.id_turno), 
+          id: String(turno.id_turno),
           title: `${turno.paciente.nombre} ${turno.paciente.apellido}`,
           start: startDate.toISOString(),
-          backgroundColor:     turno.finalizado ? 'gray' : 'cian',
-          borderColor:         turno.finalizado ? 'gray' : 'cian',
-          textColor:           'white',
+          backgroundColor: turno.finalizado ? 'gray' : '#1e40af', // bg-blue-800
+          borderColor: turno.finalizado ? 'gray' : '#1e40af', // bg-blue-800
+          textColor: 'white',
           end: new Date(
-            startDate.getTime() + turno.tratamiento.duracion * 60_000
+            startDate.getTime() + totalDuration * 60_000
           ).toISOString(),
-          extendedProps: { rawTurno: turno } 
+          extendedProps: { rawTurno: turno }
         };
       });
 
@@ -59,7 +65,7 @@ const fetchTurnos = useCallback(async () => {
     fetchTurnos();
   }, [fetchTurnos]);
 
-const addTurno = async (turno: NewTurno) => {
+  const addTurno = async (turno: NewTurno) => {
     try {
       await addTurnoAPI(turno);
       showNotification("success", "Cita creada correctamente");
@@ -72,39 +78,37 @@ const addTurno = async (turno: NewTurno) => {
   const deleteTurno = async (id: number) => {
     try {
       await deleteTurnoAPI(id);
-      showNotification("success", "Cita eliminado correctamente");
+      showNotification("success", "Cita eliminada correctamente");
       await fetchTurnos();
     } catch (err) {
       showNotification("error", (err as Error).message);
     }
   };
 
-   const updateTurno = async (turno: UpdateTurno) => {
-    console.log(turno)
+  const updateTurno = async (turno: UpdateTurno) => {
+    console.log(turno);
     try {
       await editTurnoAPI(turno);
-      showNotification("success", "Cita editado correctamente");
+      showNotification("success", "Cita editada correctamente");
       await fetchTurnos();
     } catch (err) {
       showNotification("error", (err as Error).message);
     }
   };
 
-const finaliceTurno = async (id_turno: number,turno?: FinalizePayload       
-): Promise<void> => {
-  try {
-    await finaliceTurnoAPI(id_turno);
+  const finaliceTurno = async (id_turno: number, turno?: FinalizePayload): Promise<void> => {
+    try {
+      await finaliceTurnoAPI(id_turno);
 
-    if (turno?.documento) {
-      await createDoc(turno.documento);
+      if (turno?.documento) {
+        await createDoc(turno.documento);
+      }
+      showNotification("success", "Cita finalizada correctamente");
+      await fetchTurnos();
+    } catch (err) {
+      showNotification("error", (err as Error).message);
     }
-    showNotification("success", "Cita finalizada correctamente");
-    await fetchTurnos();
-  } catch (err) {
-    showNotification("error", (err as Error).message);
-  }
-};
+  };
 
-
-  return { events, loading, error, refresh: fetchTurnos, addTurno, deleteTurno, updateTurno,finaliceTurno  };
+  return { events, loading, error, refresh: fetchTurnos, addTurno, deleteTurno, updateTurno, finaliceTurno };
 }
