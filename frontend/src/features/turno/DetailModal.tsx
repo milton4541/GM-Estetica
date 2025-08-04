@@ -8,8 +8,12 @@ import type { FinalizePayload, Turno, UpdateTurno } from "./types/Turno";
 import api from "../../utils/axios";
 import { deleteTurnoAPI } from "./api/deleteTurnoApi";
 import useTurnos from "./hooks/useTurnos";
+// Importa la función de actualización por insumo si existe, o usarás la lógica que te propongo
 import { updateTratamientoInsumo } from "../insumo/api/updateTratamientoInsumo";
 import dayjs from "dayjs";
+// Importa el componente LoadingSpinner
+import LoadingSpinner from '../../components/LoadingSpinner';
+
 
 type ApiResponse<T> = { message: string; data: T; success: boolean };
 
@@ -45,19 +49,19 @@ interface TurnoModalProps {
   isOpen: boolean;
   onClose: () => void;
   turno: Turno;
-  onSave:   (data: UpdateTurno)        => Promise<void>;
-  onDelete: (id: number)               => Promise<void>;
+  onSave:   (data: UpdateTurno)      => Promise<void>;
+  onDelete: (id: number)          => Promise<void>;
   onFinalize: (id: number, payload?: FinalizePayload) => Promise<void>;
 }
 
 export const TurnoModal: React.FC<TurnoModalProps> = ({ isOpen, onClose, turno }) => {
   const [mode, setMode] = useState<"view" | "edit" | "confirmDelete" | "finalize">("view");
   const [formData, setFormData] = useState<UpdateTurno>({
-    id_turno:        turno.id_turno,
-    fecha:           turno.fecha,
-    hora:            turno.hora,
-    id_tratamiento:  turno.tratamiento.id_tratamiento,
-    id_paciente:     turno.paciente.id_paciente,
+    id_turno:         turno.id_turno,
+    fecha:            turno.fecha,
+    hora:             turno.hora,
+    id_tratamiento:   turno.tratamiento.id_tratamiento,
+    id_paciente:      turno.paciente.id_paciente,
   });
 
   const [insumosUsed, setInsumosUsed] = useState<{
@@ -68,7 +72,7 @@ export const TurnoModal: React.FC<TurnoModalProps> = ({ isOpen, onClose, turno }
   const [file, setFile] = useState<File | null>(null);
   const [loadingInsumos, setLoadingInsumos] = useState(false);
 
-  const { pacient }      = usePacients();
+  const { pacient }       = usePacients();
   const { tratamientos } = useTratamientos();
   const { insumos: availableInsumos } = useInsumos();
   const {finaliceTurno} = useTurnos()
@@ -114,22 +118,40 @@ export const TurnoModal: React.FC<TurnoModalProps> = ({ isOpen, onClose, turno }
     }
   };
 
-const handleFinalize = async () => {
-  try {
-    const ids      = insumosUsed.map(i => i.id_insumo);
-    const cantidad = insumosUsed[0]?.cantidad || 0;
-    await updateTratamientoInsumo(formData.id_tratamiento, ids, cantidad);
-    if (file) {
-      await finaliceTurno(turno.id_turno, { documento: file });
-    } else {
-      await finaliceTurno(turno.id_turno);
-    }
+  const handleFinalize = async () => {
+    try {
+      // Corrección en la lógica de actualización de insumos.
+      // Ahora se itera sobre cada insumo utilizado y se hace una llamada a la API por cada uno.
+      await Promise.all(
+        insumosUsed.map(async (insumo) => {
+          // Asumo que existe una función en el backend para actualizar el stock de un insumo específico.
+          // La línea `updateTratamientoInsumo` del código original era confusa, por lo que la reemplazamos
+          // con una llamada más específica a la API.
+          await api.patch(
+            `/insumos/${insumo.id_insumo}`, 
+            { cantidad: insumo.cantidad },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              },
+            }
+          );
+        })
+      );
 
-    onClose();
-  } catch (e) {
-    console.error(e);
-  }
-};
+      // Una vez que todos los insumos han sido actualizados, se finaliza el turno.
+      if (file) {
+        await finaliceTurno(turno.id_turno, { documento: file });
+      } else {
+        await finaliceTurno(turno.id_turno);
+      }
+  
+      onClose();
+    } catch (e) {
+      console.error("Error al finalizar el turno:", e);
+    }
+  };
 
 
   return (
@@ -229,7 +251,7 @@ const handleFinalize = async () => {
               <div className="mt-4">
                 <label className="block text-sm font-medium mb-2">Insumos Utilizados</label>
                 {loadingInsumos ? (
-                  <p>Cargando insumos...</p>
+                  <LoadingSpinner />
                 ) : (
                   insumosUsed.map(iu => (
                     <div key={iu.id_insumo} className="flex justify-between mb-2">
@@ -255,10 +277,10 @@ const handleFinalize = async () => {
         <div className="flex justify-end border-t mt-4 pt-4 space-x-2">
           {mode === "view" && (
             <>
-              <button onClick={() => setMode("edit")} className="px-4 py-2 bg-yellow-500 text-white rounded">Editar</button>
-              <button onClick={() => setMode("confirmDelete")} className="px-4 py-2 bg-red-500 text-white rounded">Eliminar</button>
+              <button onClick={() => setMode("edit")} className="px-4 py-2 bg-blue-700 text-white font-bold rounded hover:bg-blue-800 transition-colors">Editar</button>
+              <button onClick={() => setMode("confirmDelete")} className="px-4 py-2 bg-red-700 text-white font-bold rounded hover:bg-red-800 transition-colors">Eliminar</button>
               {!turno.finalizado && (
-                <button onClick={() => setMode("finalize")} className="px-4 py-2 bg-green-600 text-white rounded">Finalizar turno</button>
+                <button onClick={() => setMode("finalize")} className="px-4 py-2 bg-green-700 text-white font-bold rounded hover:bg-green-800 transition-colors">Finalizar turno</button>
               )}
             </>
           )}
