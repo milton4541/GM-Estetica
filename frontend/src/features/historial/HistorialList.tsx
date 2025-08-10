@@ -64,7 +64,7 @@ export function HistorialTratamientos() {
               minWidth: 160,
               // Estilos para el Select en estado normal
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#1976d2', // Color del borde
+                borderColor: '#0a4682ff', // Color del borde
               },
               '& .MuiSvgIcon-root': {
                 color: '#1976d2', // Color de la flecha

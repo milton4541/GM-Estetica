@@ -17,13 +17,13 @@ export default function Layout() {
   return (
     <div className="font-sans antialiased min-h-screen bg-gray-50 flex">
       {/* Barra lateral de navegación */}
-      <aside className="w-64 min-h-screen bg-blue-800 text-white p-6 overflow-y-auto shadow-xl">
-        <h1 className="text-2xl font-bold mb-6">Sistema de Gestión</h1>
+      <aside className="w-64 min-h-screen text-white p-6 overflow-y-auto shadow-xl sidebar-bg">
+        <h1 className="text-2xl font-bold mb-6 text-shadow-sm">Sistema de Gestión</h1>
         <nav className="space-y-0.5">
           {/* Aquí los Links solo tienen las clases de estilo de borde y hover */}
           <Link
             to="/"
-            className="rounded-lg hover:bg-blue-700 transition-colors block"
+            className="rounded-lg hover:bg-blue-900 transition-colors block"
           >
             <Options
               icon={<FontAwesomeIcon icon={faCalendarPlus} size="lg" />}
@@ -33,7 +33,7 @@ export default function Layout() {
 
           <Link
             to="/pacientes"
-            className="rounded-lg hover:bg-blue-700 transition-colors block"
+            className="rounded-lg hover:bg-blue-900 transition-colors block"
           >
             <Options
               icon={<FontAwesomeIcon icon={faUserInjured} size="lg" />}
@@ -43,7 +43,7 @@ export default function Layout() {
 
           <Link
             to="/insumos"
-            className="rounded-lg hover:bg-blue-700 transition-colors block"
+            className="rounded-lg hover:bg-blue-900 transition-colors block"
           >
             <Options
               icon={<FontAwesomeIcon icon={faBoxOpen} size="lg" />}
@@ -53,7 +53,7 @@ export default function Layout() {
 
           <Link
             to="/tratamientos"
-            className="rounded-lg hover:bg-blue-700 transition-colors block"
+            className="rounded-lg hover:bg-blue-900 transition-colors block"
           >
             <Options
               icon={<FontAwesomeIcon icon={faHandHoldingMedical} size="lg" />}
@@ -63,7 +63,7 @@ export default function Layout() {
 
           <Link
             to="/historial"
-            className="rounded-lg hover:bg-blue-700 transition-colors block"
+            className="rounded-lg hover:bg-blue-900 transition-colors block"
           >
             <Options
               icon={<FontAwesomeIcon icon={faHistory} size="lg" />}
@@ -73,7 +73,7 @@ export default function Layout() {
 
           <Link
             to="/facturas"
-            className="rounded-lg hover:bg-blue-700 transition-colors block"
+            className="rounded-lg hover:bg-blue-900 transition-colors block"
           >
             <Options
               icon={<FontAwesomeIcon icon={faFileInvoiceDollar} size="lg" />}
@@ -83,7 +83,7 @@ export default function Layout() {
 
           <Link
             to="/reportes"
-            className="rounded-lg hover:bg-blue-700 transition-colors block"
+            className="rounded-lg hover:bg-blue-900 transition-colors block"
           >
             <Options
               icon={<FontAwesomeIcon icon={faChartBar} size="lg" />}

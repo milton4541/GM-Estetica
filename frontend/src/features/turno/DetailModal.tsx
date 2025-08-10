@@ -119,39 +119,21 @@ export const TurnoModal: React.FC<TurnoModalProps> = ({ isOpen, onClose, turno }
   };
 
   const handleFinalize = async () => {
-    try {
-      // Corrección en la lógica de actualización de insumos.
-      // Ahora se itera sobre cada insumo utilizado y se hace una llamada a la API por cada uno.
-      await Promise.all(
-        insumosUsed.map(async (insumo) => {
-          // Asumo que existe una función en el backend para actualizar el stock de un insumo específico.
-          // La línea `updateTratamientoInsumo` del código original era confusa, por lo que la reemplazamos
-          // con una llamada más específica a la API.
-          await api.patch(
-            `/insumos/${insumo.id_insumo}`, 
-            { cantidad: insumo.cantidad },
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            }
-          );
-        })
-      );
+  try {
+    const ids      = insumosUsed.map(i => i.id_insumo);
+    const cantidad = insumosUsed[0]?.cantidad || 0;
+    await updateTratamientoInsumo(formData.id_tratamiento, ids, cantidad); 
+    if (file) {
+      await finaliceTurno(turno.id_turno, { documento: file });
+    } else {
+      await finaliceTurno(turno.id_turno);
+    }
 
-      // Una vez que todos los insumos han sido actualizados, se finaliza el turno.
-      if (file) {
-        await finaliceTurno(turno.id_turno, { documento: file });
-      } else {
-        await finaliceTurno(turno.id_turno);
-      }
-  
-      onClose();
-    } catch (e) {
-      console.error("Error al finalizar el turno:", e);
-    }
-  };
+    onClose();
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 
   return (

@@ -39,7 +39,7 @@ export default function PacienteList() {
           onClick={() => {
             setIsOpen(true);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mb-6"
+          className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mb-6"
         >
           Agregar Paciente <FaUserPlus />
         </button>

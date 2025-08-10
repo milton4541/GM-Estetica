@@ -2,9 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Estilo para todos los botones de FullCalendar */
+/* Añade esta nueva clase CSS para la imagen de fondo de la barra lateral */
+.sidebar-bg {
+  background-image: url("./imagenes/barra3.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative; /* Necesario para el pseudo-elemento */
+}
+
+/* Opcional: overlay para mejorar la legibilidad del texto */
+.sidebar-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4); /* Overlay semitransparente oscuro */
+  z-index: 0; /* Asegura que el overlay esté detrás del contenido */
+}
+
+/* Mueve el contenido de la barra lateral sobre el overlay */
+.sidebar-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Opcional: una sombra de texto sutil para mejorar la legibilidad */
+.text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo para todos los botones de FullCalendar (AZUL OSCURO) */
 .fc .fc-button {
-  background-color: #1e40af; /* El color de bg-blue-800 */
+  background-color: #184ea4; /* Un azul más oscuro */
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -15,47 +47,16 @@
 
 /* Efecto de hover para los botones */
 .fc .fc-button:hover {
-  background-color: #1d4ed8; /* Un azul ligeramente más claro para el hover (bg-blue-700) */
+  background-color: #113e97; /* Un azul ligeramente más oscuro para el hover */
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -2px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilo para el título del calendario (la fecha) */
-.fc .fc-toolbar-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
 }
 
 /* Estilo para los botones que ya están activos (ej. el que muestra la vista actual) */
 .fc .fc-button-primary:not(:disabled).fc-button-active,
 .fc .fc-button-primary:not(:disabled):active {
-  background-color: #1d4ed8; /* También usamos bg-blue-700 para el estado activo */
-  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
-}
-
-/* Estilos para los botones del encabezado */
-.fc .fc-button {
-  background-color: #1e40af; /* bg-blue-800 */
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-weight: 600;
-  transition: all 0.2s ease-in-out;
-}
-
-.fc .fc-button:hover {
-  background-color: #1d4ed8; /* bg-blue-700 */
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -2px rgba(0, 0, 0, 0.1);
-}
-
-.fc .fc-button-primary:not(:disabled).fc-button-active,
-.fc .fc-button-primary:not(:disabled):active {
-  background-color: #1d4ed8; /* bg-blue-700 para el estado activo */
+  background-color: #093377; /* Un azul más oscuro para el estado activo */
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
@@ -81,7 +82,7 @@
 
 /* Estilo para los eventos */
 .fc-event {
-  background-color: #1e40af; /* bg-blue-800 para que se vea con el mismo color de la barra lateral */
+  background-color: #092a60; /* Mismo azul que los botones */
   color: #ffffff; /* Texto blanco para un contraste perfecto */
   border: none;
   border-radius: 4px;
@@ -101,14 +102,6 @@
 /* Resaltar los fines de semana (sábado y domingo) */
 .fc .fc-day-sat, .fc .fc-day-sun {
   background-color: #f9fafb; /* Un gris claro para el fin de semana */
-}
-
-/* Permite que los eventos de FullCalendar usen múltiples líneas de texto */
-.fc-event-main-frame {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  white-space: normal;
 }
 
 /* Permite que los eventos de FullCalendar usen múltiples líneas de texto */
