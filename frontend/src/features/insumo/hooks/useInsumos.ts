@@ -8,6 +8,7 @@ import { editInsumosAPI } from "../api/editInsumoApi";
 
 export type InsumosSliceType = {
   insumos: insumoWithId[];
+  loading: boolean;
   fetchInsumos: () => void;
   addInsumo: (insumo: Insumo) => void;
   deleteInsumo: (id: number) => void;
@@ -16,14 +17,18 @@ export type InsumosSliceType = {
 
 export default function useInsumos(): InsumosSliceType {
   const [insumos, setInsumos] = useState<insumoWithId[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchInsumos = async () => {
+    setLoading(true);
     try {
       const data = await getInsumos();
       setInsumos(data);
     } catch (error) {
       const msg = (error as Error).message || "Error al cargar insumos";
       showNotification("error", msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,6 +37,7 @@ export default function useInsumos(): InsumosSliceType {
   }, []);
 
   const addInsumo = async (insumo: Insumo) => {
+    setLoading(true);
     try {
       await addInsumoApi(insumo);
       showNotification("success", "Insumo agregado correctamente");
@@ -39,10 +45,13 @@ export default function useInsumos(): InsumosSliceType {
     } catch (error) {
       const msg = (error as Error).message || "Ocurrió un error desconocido";
       showNotification("error", msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   const deleteInsumo = async (id: number) => {
+    setLoading(true);
     try {
       await deleteInsumoAPI(id);
       showNotification("success", "Insumo eliminado correctamente");
@@ -50,10 +59,13 @@ export default function useInsumos(): InsumosSliceType {
     } catch (error) {
       const msg = (error as Error).message || "Ocurrió un error desconocido";
       showNotification("error", msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   const editInsumo = async (insumo: insumoWithId) => {
+    setLoading(true);
     try {
       await editInsumosAPI(insumo);
       showNotification("success", "Insumo editado correctamente");
@@ -61,8 +73,10 @@ export default function useInsumos(): InsumosSliceType {
     } catch (error) {
       const msg = (error as Error).message || "Ocurrió un error desconocido";
       showNotification("error", msg);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { insumos, fetchInsumos, addInsumo, deleteInsumo, editInsumo };
+  return { insumos, loading, fetchInsumos, addInsumo, deleteInsumo, editInsumo };
 }

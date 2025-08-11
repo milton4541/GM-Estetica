@@ -1,17 +1,23 @@
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+
 import Modal from '../../components/modal';
-import { useState } from 'react';
-import type { Tratamiento, TratamientoWithId } from './types/tratamiento';
 import ConfirmAction from '../../components/confirmAction';
+import LoadingSpinner from '../../components/LoadingSpinner';
+
 import useTratamientos from './hooks/useTratamientos';
-import TratamientoForm from './TratamientosForm';
-import TratamientoEditForm from './TratamientosEditForm';
 import useInsumos from '../insumo/hooks/useInsumos';
 
+import type { Tratamiento, TratamientoWithId } from './types/tratamiento';
+
+import TratamientoForm from './TratamientosForm';
+import TratamientoEditForm from './TratamientosEditForm';
+
 export default function TratamientoList() {
-  const { tratamientos, addTratamiento, deleteTratamiento, editTratamiento } = useTratamientos();
+  const { tratamientos, loading, addTratamiento, deleteTratamiento, editTratamiento } = useTratamientos();
   const { insumos } = useInsumos();
+
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -32,6 +38,12 @@ export default function TratamientoList() {
     setIsOpenDelete(false);
   };
 
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <LoadingSpinner />
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-4">
       <div className="bg-white rounded-lg shadow-lg p-6">
@@ -39,6 +51,7 @@ export default function TratamientoList() {
         <button
           onClick={() => setIsOpenAdd(true)}
           className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mb-4"
+          disabled={loading}
         >
           Agregar Tratamiento <FaPlus />
         </button>
@@ -71,6 +84,7 @@ export default function TratamientoList() {
                         setIsOpenEdit(true);
                       }}
                       className="text-blue-600 hover:text-blue-900 transition-all"
+                      disabled={loading}
                     >
                       <FaEdit />
                     </IconButton>
@@ -82,6 +96,7 @@ export default function TratamientoList() {
                         setIsOpenDelete(true);
                       }}
                       className="text-red-600 hover:text-red-900 transition-all"
+                      disabled={loading}
                     >
                       <FaTrash />
                     </IconButton>
@@ -110,6 +125,7 @@ export default function TratamientoList() {
         <ConfirmAction
           onConfirm={() => {
             handleDelete(selectedTratamiento.id_tratamiento);
+            setIsOpenDelete(false);
           }}
           onCancel={() => setIsOpenDelete(false)}
         />

@@ -12,7 +12,6 @@ type Props = {
   addTurno: (t: NewTurno) => Promise<void>;
 };
 
-// Estilos personalizados para react-select
 const customStyles = {
   control: (provided: any, state: { isFocused: any }) => ({
     ...provided,
@@ -39,6 +38,7 @@ const customStyles = {
 export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
   const [clientId, setClientId] = useState<number | null>(null);
   const [selectedTratamientos, setSelectedTratamientos] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const { pacient } = usePacients();
   const { tratamientos } = useTratamientos();
@@ -70,14 +70,20 @@ export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
     e.preventDefault();
     if (clientId === null || selectedTratamientos.length === 0) return;
 
-    await addTurno({
-      fecha: formatDateAPI(selectedDate),
-      hora: formatTimeAPI(selectedDate),
-      id_tratamiento: selectedTratamientos,
-      id_paciente: clientId,
-    });
-
-    onClose();
+    setLoading(true);
+    try {
+      await addTurno({
+        fecha: formatDateAPI(selectedDate),
+        hora: formatTimeAPI(selectedDate),
+        id_tratamiento: selectedTratamientos,
+        id_paciente: clientId,
+      });
+      onClose();
+    } catch (error) {
+      // acá podés manejar error si querés
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,6 +105,7 @@ export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
               placeholder="Selecciona un paciente..."
               isSearchable
               styles={customStyles}
+              isDisabled={loading}
             />
           </div>
 
@@ -113,6 +120,7 @@ export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
               }
               placeholder="Selecciona tratamientos..."
               styles={customStyles}
+              isDisabled={loading}
             />
           </div>
 
@@ -121,15 +129,42 @@ export default function AddTurno({ onClose, selectedDate, addTurno }: Props) {
               type="button"
               onClick={onClose}
               className="px-4 py-2 border rounded-lg text-gray-700 bg-white hover:bg-gray-100 transition-colors"
+              disabled={loading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={!clientId || selectedTratamientos.length === 0}
-              className="px-4 py-2 text-white rounded-lg bg-blue-800 hover:bg-blue-700 disabled:opacity-50 disabled:bg-gray-400 transition-colors"
+              disabled={!clientId || selectedTratamientos.length === 0 || loading}
+              className="px-4 py-2 text-white rounded-lg bg-blue-800 hover:bg-blue-700 disabled:opacity-50 disabled:bg-gray-400 transition-colors flex items-center justify-center"
             >
-              Guardar Cita
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                  Guardando...
+                </>
+              ) : (
+                "Guardar Cita"
+              )}
             </button>
           </div>
         </form>

@@ -1,12 +1,13 @@
 import { useState, Fragment, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, IconButton, Select, MenuItem, Button, Collapse, TextField
+  Paper, IconButton, Select, MenuItem, Button, Collapse, TextField, Alert
 } from '@mui/material';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { Autocomplete } from '@mui/material';
+
 import useTratamientos from '../tratamiento/hooks/useTratamientos';
 import usePacients from '../paciente/hooks/usePacient';
 import useHistorial from './hooks/useHistorial';
@@ -15,6 +16,7 @@ import type { TratamientoWithId } from '../tratamiento/types/tratamiento';
 import { DocumentosPorHistorial } from './DocumentosPorHistorial';
 import ModalRegistro from '../factura/FacturaModal';
 import useFactura from '../factura/hooks/useFactura';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export function HistorialTratamientos() {
   const { tratamientos } = useTratamientos();
@@ -31,7 +33,7 @@ export function HistorialTratamientos() {
     importe: number;
   } | null>(null);
 
-  const { historial, fetchByPaciente, fetchByTratamiento, fetchHistorial } = useHistorial();
+  const { historial, loading, error, fetchByPaciente, fetchByTratamiento, fetchHistorial } = useHistorial();
   const { createFactura } = useFactura();
 
   useEffect(() => {
@@ -44,13 +46,27 @@ export function HistorialTratamientos() {
     }
   }, [filterType, filterPaciente, filterTratamiento, fetchByPaciente, fetchByTratamiento, fetchHistorial]);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-4">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Historial de Tratamientos</h2>
 
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         {/* FILTROS */}
-        <div className="flex gap-4 mb-6 items-end">
+        <div className="flex gap-4 mb-6 items-end" aria-disabled={loading}>
           <Select
             value={filterType}
             displayEmpty
@@ -62,28 +78,14 @@ export function HistorialTratamientos() {
             }}
             sx={{
               minWidth: 160,
-              // Estilos para el Select en estado normal
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#0a4682ff', // Color del borde
-              },
-              '& .MuiSvgIcon-root': {
-                color: '#1976d2', // Color de la flecha
-              },
-              '& .MuiSelect-select': {
-                color: '#1976d2', // Color del texto
-              },
-              // Estilos para el Select en estado de foco
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#1976d2',
-              },
-              '&.Mui-focused .MuiSvgIcon-root': {
-                color: '#1976d2',
-              },
-              // Estilos para el Select en estado de hover
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#1976d2',
-              },
+              '& .MuiOutlinedInput-notchedOutline': { borderColor: '#0a4682ff' },
+              '& .MuiSvgIcon-root': { color: '#1976d2' },
+              '& .MuiSelect-select': { color: '#1976d2' },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' },
+              '&.Mui-focused .MuiSvgIcon-root': { color: '#1976d2' },
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' },
             }}
+            disabled={loading}
           >
             <MenuItem value="">— Mostrar todo —</MenuItem>
             <MenuItem value="paciente">Por Paciente</MenuItem>
@@ -97,11 +99,11 @@ export function HistorialTratamientos() {
               value={filterPaciente}
               onChange={(_, newVal) => setFilterPaciente(newVal)}
               sx={{ width: 240 }}
+              disabled={loading}
               renderInput={params => (
                 <TextField
                   {...params}
                   label="Selecciona paciente"
-                  // Estilos para el TextField en estado de foco
                   sx={{
                     '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#1976d2',
@@ -122,11 +124,11 @@ export function HistorialTratamientos() {
               value={filterTratamiento}
               onChange={(_, newVal) => setFilterTratamiento(newVal)}
               sx={{ width: 240 }}
+              disabled={loading}
               renderInput={params => (
                 <TextField
                   {...params}
                   label="Selecciona tratamiento"
-                  // Estilos para el TextField en estado de foco
                   sx={{
                     '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#1976d2',
@@ -146,6 +148,7 @@ export function HistorialTratamientos() {
               setFilterPaciente(null);
               setFilterTratamiento(null);
             }}
+            disabled={loading}
           >
             Limpiar filtro
           </Button>

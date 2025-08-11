@@ -2,11 +2,20 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import useFactura from './hooks/useFactura';
 import usePacients from '../paciente/hooks/usePacient';
 import useTratamientos from '../tratamiento/hooks/useTratamientos';
+import LoadingSpinner from '../../components/LoadingSpinner'; // ajusta el path si hace falta
 
 export default function FacturaList() {
-  const { factura } = useFactura();
+  const { factura, loading } = useFactura();
   const { pacient } = usePacients();
   const { tratamientos } = useTratamientos();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4">
