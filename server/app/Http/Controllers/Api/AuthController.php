@@ -135,34 +135,45 @@ public function register(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'nombre_usuario' => 'required|string',
-        'password' => 'required|string',
+        'password'       => 'required|string',
     ]);
+
     if ($validator->fails()) {
         return response()->json(['error' => $validator->errors()], 422);
     }
 
-    //dd(env('JWT_SECRET'));
+    $credentials = $request->only('nombre_usuario', 'password');
 
-    $credentials = [
-        'nombre_usuario' => $request->nombre_usuario,
-        'password' => $request->password,
-    ];
     try {
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
     } catch (JWTException $e) {
-       return response()->json([
-        'error' => 'No se pudo crear el token',
-        'message' => $e->getMessage(),
-],       500);
+        return response()->json([
+            'error'   => 'No se pudo crear el token',
+            'message' => $e->getMessage(),
+        ], 500);
     }
+
+    // Usuario autenticado
+    $user = JWTAuth::user() ?? JWTAuth::setToken($token)->toUser();
+
+    // Cargar relación rol (usa rols.id)
+    $user->loadMissing('rol'); // o: ->loadMissing('rol:id,nombre_rol');
 
     return response()->json([
         'access_token' => $token,
-        'token_type' => 'bearer',
-        'expires_in' => auth('api')->factory()->getTTL() * 60,
-        'user' => auth('api')->user(),
+        'token_type'   => 'bearer',
+        'expires_in'   => auth('api')->factory()->getTTL() * 60,
+        'user'         => [
+            'id_usuario'      => $user->id_usuario,                 // tu PK real
+            'nombre'          => $user->nombre,
+            'apellido'        => $user->apellido,
+            'nombre_usuario'  => $user->nombre_usuario,
+            'email'           => $user->email,
+            'id_rol'          => $user->id_rol,                     // FK en users
+            'rol'             => optional($user->rol)->nombre_rol,  // nombre legible
+        ],
     ]);
 }
 /**

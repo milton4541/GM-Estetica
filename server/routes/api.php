@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TurnoController;
 use App\Http\Controllers\Api\TratamientoInsumoController;
 use App\Http\Controllers\Api\ReporteAdministrativoController;
-
+ 
 
 //rutas publicas
 Route::post('register',[AuthController::class,'register']);
