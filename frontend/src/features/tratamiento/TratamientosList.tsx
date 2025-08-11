@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 
@@ -23,7 +23,7 @@ export default function TratamientoList() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [selectedTratamiento, setSelectedTratamiento] = useState<TratamientoWithId | null>(null);
 
-  const handleAdd = (tratamiento: Tratamiento) => {
+  const handleAdd = async (tratamiento: Tratamiento) => {
     addTratamiento(tratamiento);
     setIsOpenAdd(false);
   };

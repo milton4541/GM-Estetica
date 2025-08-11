@@ -43,13 +43,14 @@ export default function useTratamientos(): TratamientosSliceType {
   const addTratamiento = async (tratamiento: Tratamiento) => {
     setLoading(true);
     try {
+      console.log("tratamientos ",tratamiento)
       const newTratamiento = await addTratamientoApi(tratamiento);
       await Promise.all(
         tratamiento.insumo.map((insumo) =>
           addInsumoATratamientoApi({
             id_tratamiento: newTratamiento.id_tratamiento,
             id_insumo: insumo.id_insumo,
-            cantidad: insumo.cantidad ?? 1,
+            cantidad: 1,
           })
         )
       );
@@ -83,7 +84,7 @@ export default function useTratamientos(): TratamientosSliceType {
     try {
       await editTratamientoAPI(tratamiento); // actualiza cabecera
       const ids = tratamiento.insumo.map((i) => i.id_insumo);
-      const cantidadComun = tratamiento.insumo[0]?.cantidad ?? 1;
+      const cantidadComun =  1;
       await editTratInsumoApi(tratamiento.id_tratamiento, ids, cantidadComun);
       showNotification("success", "Tratamiento editado correctamente");
       await fetchTratamientos();

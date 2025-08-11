@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { showNotification } from "../../../utils/showNotification";
-import type { Insumo, insumoWithId } from "../types/insumo";
+import type { Insumo, insumoWithId, ReestockPayload } from "../types/insumo";
 import { getInsumos } from "../api/getInsumos";
 import { addInsumoApi } from "../api/addInsumoApi";
 import { deleteInsumoAPI } from "../api/deleteInsumoApi";
 import { editInsumosAPI } from "../api/editInsumoApi";
+import { reestockInsumoAPI } from "../api/reestock";
 
 export type InsumosSliceType = {
   insumos: insumoWithId[];
@@ -13,6 +14,7 @@ export type InsumosSliceType = {
   addInsumo: (insumo: Insumo) => void;
   deleteInsumo: (id: number) => void;
   editInsumo: (insumo: insumoWithId) => void;
+reestockInsumo: (payload: ReestockPayload) => void;
 };
 
 export default function useInsumos(): InsumosSliceType {
@@ -77,6 +79,18 @@ export default function useInsumos(): InsumosSliceType {
       setLoading(false);
     }
   };
-
-  return { insumos, loading, fetchInsumos, addInsumo, deleteInsumo, editInsumo };
+  const reestockInsumo = async (payload: ReestockPayload) => {
+    setLoading(true);
+    try {
+      await reestockInsumoAPI(payload);
+      showNotification('success', 'Reestock realizado correctamente');
+      await fetchInsumos();
+    } catch (error) {
+      const msg = (error as Error).message || 'Ocurrió un error desconocido';
+      showNotification('error', msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+  return { insumos, loading, fetchInsumos, addInsumo, deleteInsumo, editInsumo,reestockInsumo };
 }

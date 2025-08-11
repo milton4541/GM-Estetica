@@ -16,7 +16,7 @@ database/database.sqlite
 /storage/framework/cache/data/*
 /storage/framework/sessions/*
 /storage/framework/views/*
-
+/server/database/database.sqlite
 # Jetstream / Breeze / Fortify / Sanctum tokens
 public/hot
 public/mix-manifest.json
