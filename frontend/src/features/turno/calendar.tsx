@@ -9,6 +9,7 @@ import type { DateClickArg } from "@fullcalendar/interaction";
 import type { EventClickArg } from "@fullcalendar/core/index.js";
 import type { Turno } from "./types/Turno";
 import DetailModal from "./DetailModal";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const CalendarPage = () => {
   const { events, loading, refresh, addTurno, deleteTurno, updateTurno, finaliceTurno } = useTurnos();
@@ -29,7 +30,6 @@ const CalendarPage = () => {
     setDetailOpen(true);
   };
 
-  // Función para renderizar el contenido del evento de forma robusta
   const renderEventContent = (eventInfo: any) => {
     const { rawTurno } = eventInfo.event.extendedProps;
     
@@ -37,9 +37,7 @@ const CalendarPage = () => {
       return null;
     }
     
-    // AHORA ACCEDEMOS A UN TRATAMIENTO ÚNICO
     const totalDuration = rawTurno.tratamiento.duracion || 0;
-
     const startDate = new Date(eventInfo.event.start);
     const endDate = new Date(startDate.getTime() + totalDuration * 60_000);
     
@@ -51,7 +49,9 @@ const CalendarPage = () => {
     return (
       <div className="p-1">
         <div className="font-bold text-sm leading-tight text-white">{`${formattedHoraInicio} - ${formattedHoraFin}`}</div>
-        <div className="text-xs leading-tight text-white">{rawTurno.paciente.nombre} {rawTurno.paciente.apellido}</div>
+        <div className="text-xs leading-tight text-white">
+          {rawTurno.paciente.nombre} {rawTurno.paciente.apellido}
+        </div>
         {tratamiento && (
           <div className="text-xs text-gray-200 mt-1">
             {tratamiento}
@@ -61,7 +61,8 @@ const CalendarPage = () => {
     );
   };
 
-  if (loading) return <p>Cargando turnos…</p>;
+  // ⬇️ Aquí cambiamos el mensaje por el spinner
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto p-4 bg-white rounded-lg shadow-lg">

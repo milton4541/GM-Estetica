@@ -1,6 +1,5 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
-import { FaUserPlus } from 'react-icons/fa';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaUserPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import Modal from '../../components/modal';
 import { useState } from 'react';
 import PacientForm from './PacientForm';
@@ -8,12 +7,13 @@ import type { Pacient, PacientWithId } from './types/pacient';
 import ConfirmAction from '../../components/confirmAction';
 import usePacients from './hooks/usePacient';
 import PacientEditForm from './PacientEdit';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function PacienteList() {
+  const { pacient, loading, addPacient, deletePacient, editPacient } = usePacients();
 
-  const {pacient, addPacient, deletePacient, editPacient} = usePacients()
-  const [isOpen, setIsOpen] = useState(false); 
-  const [isOpenDelete, setIsOpenDelete] = useState(false); 
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [selectedClient, setSelectedClient] = useState<PacientWithId | null>(null);
 
@@ -22,24 +22,28 @@ export default function PacienteList() {
     setIsOpenEdit(false);
   };
   const handleDelete = (id: number) => {
-    console.log(`Eliminando el paciente con id: ${id}`);
-    deletePacient(id);    
-    setIsOpenDelete(false); 
+    deletePacient(id);
+    setIsOpenDelete(false);
   };
   const handleAddPacient = (pacient: Pacient) => {
     addPacient(pacient);
     setIsOpen(false);
   };
 
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <LoadingSpinner />
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-4">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Lista de Pacientes</h2>
         <button
-          onClick={() => {
-            setIsOpen(true);
-          }}
+          onClick={() => setIsOpen(true)}
           className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mb-6"
+          disabled={loading}
         >
           Agregar Paciente <FaUserPlus />
         </button>
@@ -80,6 +84,7 @@ export default function PacienteList() {
                         setIsOpenEdit(true);
                       }}
                       className="text-blue-600 hover:text-blue-900 transition-all"
+                      disabled={loading}
                     >
                       <FaEdit />
                     </IconButton>
@@ -92,6 +97,7 @@ export default function PacienteList() {
                         setIsOpenDelete(true);
                       }}
                       className="text-red-600 hover:text-red-900 transition-all"
+                      disabled={loading}
                     >
                       <FaTrash />
                     </IconButton>

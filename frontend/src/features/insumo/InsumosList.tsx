@@ -7,9 +7,11 @@ import ConfirmAction from '../../components/confirmAction';
 import InsumoEditForm from './InsumoEditForm';
 import useInsumos from './hooks/useInsumos';
 import InsumoForm from './InsumoForm';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function InsumoList() {
-  const { insumos, addInsumo, deleteInsumo, editInsumo } = useInsumos();
+  const { insumos, loading, addInsumo, deleteInsumo, editInsumo } = useInsumos();
+
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -30,6 +32,12 @@ export default function InsumoList() {
     setIsOpenDelete(false);
   };
 
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <LoadingSpinner />
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-4">
       <div className="bg-white rounded-lg shadow-lg p-6">
@@ -37,6 +45,7 @@ export default function InsumoList() {
         <button
           onClick={() => setIsOpenAdd(true)}
           className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mb-4"
+          disabled={loading}
         >
           Agregar Insumo <FaPlus />
         </button>
@@ -62,7 +71,6 @@ export default function InsumoList() {
             <TableBody>
               {insumos.map((row) => (
                 <TableRow key={row.id_insumo}>
-                  {/* Aquí aplicamos el estilo para las celdas */}
                   <TableCell sx={{ padding: '8px 16px' }}>{row.componentes}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.nombre}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.precio_insumo.toFixed(2)}</TableCell>
@@ -76,6 +84,7 @@ export default function InsumoList() {
                         setIsOpenEdit(true);
                       }}
                       className="text-blue-600 hover:text-blue-900 transition-all"
+                      disabled={loading}
                     >
                       <FaEdit />
                     </IconButton>
@@ -87,6 +96,7 @@ export default function InsumoList() {
                         setIsOpenDelete(true);
                       }}
                       className="text-red-600 hover:text-red-900 transition-all"
+                      disabled={loading}
                     >
                       <FaTrash />
                     </IconButton>
@@ -114,6 +124,7 @@ export default function InsumoList() {
         <ConfirmAction
           onConfirm={() => {
             handleDelete(selectedInsumo.id_insumo);
+            setIsOpenDelete(false);
           }}
           onCancel={() => setIsOpenDelete(false)}
         />
