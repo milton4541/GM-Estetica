@@ -227,10 +227,21 @@ public function register(Request $request)
  * )
  */
 
-    public function logout(){
-        JWTAuth::invalidate(JWTAuth::getToken());
-        return response()->json(['message' => 'Sesión cerrada correctamente'],200);
+public function logout()
+{
+    try {
+        if (! $token = JWTAuth::getToken()) {
+            return response()->json(['message' => 'Token no encontrado.'], 401);
+        }
+
+        JWTAuth::invalidate($token); // agrega el token a la blacklist
+        return response()->json(['message' => 'Sesión cerrada correctamente'], 200);
+
+    } catch (JWTException $e) {
+        // token inválido, expirado o ya invalidado
+        return response()->json(['message' => 'Token inválido o expirado.'], 401);
     }
+}
     
     public function createRol(Request $request): JsonResponse
     {
@@ -259,4 +270,25 @@ public function register(Request $request)
             'data'    => $rol,
         ], 201);
     }
+
+    public function getRoles(): JsonResponse
+{
+    $roles = Rol::all();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Listado de roles',
+        'data'    => $roles,
+    ], 200);
+}
+
+   public function getUsuarios()
+    {
+        $user = User::all();
+        return response()->json([
+        'success' => true,
+        'message' => 'Listado de roles',
+        'data'    => $user,
+    ], 200);    }
+
 }

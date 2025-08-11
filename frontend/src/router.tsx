@@ -12,6 +12,7 @@ import InsumoList from './features/insumo/InsumosList';
 import TratamientoList from './features/tratamiento/TratamientosList';
 import FacturaList from './features/factura/FacturaList';
 import ReportesView from './features/reportes/ReportList';
+import UsuariosView from './features/usuarios/User';
 
 export default function AppRouter() {
   return (
@@ -54,6 +55,14 @@ export default function AppRouter() {
           element={
             <RequireRole roles={[ROLES.ADMIN]}>
               <ReportesView />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="usuarios"
+          element={
+            <RequireRole roles={[ROLES.ADMIN]}>
+              <UsuariosView />
             </RequireRole>
           }
         />
