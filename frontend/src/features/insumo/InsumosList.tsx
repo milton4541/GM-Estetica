@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSyncAlt } from 'react-icons/fa';
 import Modal from '../../components/modal';
 import { useState } from 'react';
 import type { Insumo, insumoWithId } from './types/insumo';
@@ -10,12 +10,16 @@ import InsumoForm from './InsumoForm';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function InsumoList() {
-  const { insumos, loading, addInsumo, deleteInsumo, editInsumo } = useInsumos();
+  const { insumos, loading, addInsumo, deleteInsumo, editInsumo, reestockInsumo  } = useInsumos();
 
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [selectedInsumo, setSelectedInsumo] = useState<insumoWithId | null>(null);
+
+  // Estado para Reestock
+  const [restockQty, setRestockQty] = useState<Record<number, number>>({});
+  const [restockLoadingId, setRestockLoadingId] = useState<number | null>(null);
 
   const handleAdd = (insumo: Insumo) => {
     addInsumo(insumo);
@@ -32,11 +36,23 @@ export default function InsumoList() {
     setIsOpenDelete(false);
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center h-64">
-      <LoadingSpinner />
-    </div>
-  );
+  const handleRestockChange = (id: number, value: string) => {
+    const n = Math.max(1, Number(value));
+    setRestockQty((prev) => ({ ...prev, [id]: Number.isFinite(n) ? Math.trunc(n) : 1 }));
+  };
+
+const handleRestock = (row: insumoWithId) => {
+  const cantidad = Number(restockQty[row.id_insumo] ?? 1);
+  if (!Number.isInteger(cantidad) || cantidad < 1) return; // validación simple
+  reestockInsumo({ id_insumo: row.id_insumo, cantidad });
+};
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner />
+      </div>
+    );
 
   return (
     <div className="container mx-auto p-4">
@@ -64,6 +80,7 @@ export default function InsumoList() {
                 <TableCell sx={{ fontWeight: 'bold' }}>Cantidad</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Cantidad Mínima</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Fecha Expiración</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Reestock</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Editar</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Eliminar</TableCell>
               </TableRow>
@@ -73,10 +90,38 @@ export default function InsumoList() {
                 <TableRow key={row.id_insumo}>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.componentes}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.nombre}</TableCell>
-                  <TableCell sx={{ padding: '8px 16px' }}>{row.precio_insumo.toFixed(2)}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    {row.precio_insumo.toFixed(2)}
+                  </TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.cantidad}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.cantidad_min}</TableCell>
-                  <TableCell sx={{ padding: '8px 16px' }}>{new Date(row.fecha_expiracion).toLocaleDateString()}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    {new Date(row.fecha_expiracion).toLocaleDateString()}
+                  </TableCell>
+
+                  {/* Reestock */}
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={1}
+                        className="w-20 border rounded px-2 py-1"
+                        value={restockQty[row.id_insumo] ?? 1}
+                        onChange={(e) => handleRestockChange(row.id_insumo, e.target.value)}
+                        disabled={loading || restockLoadingId === row.id_insumo}
+                      />
+                      <button
+                        onClick={() => handleRestock(row)}
+                        disabled={loading || restockLoadingId === row.id_insumo}
+                        className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold py-2 px-3 rounded inline-flex items-center gap-2"
+                        title="Reestock"
+                      >
+                        <FaSyncAlt />
+                        <span className="hidden sm:inline">Reestock</span>
+                      </button>
+                    </div>
+                  </TableCell>
+
                   <TableCell sx={{ padding: '8px 16px' }}>
                     <IconButton
                       onClick={() => {

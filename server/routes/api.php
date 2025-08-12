@@ -20,6 +20,9 @@ use App\Http\Controllers\Api\ReporteAdministrativoController;
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
 Route::post('rol',[AuthController::class,'createRol']);
+Route::get('getRol',[AuthController::class,'getRoles']);
+Route::get('getUsuarios',[AuthController::class,'getUsuarios']);
+
 
 //rutas privadas (necesitas auth)
 Route::middleware([IsUserAuth::class])->group(function () {
