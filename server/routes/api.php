@@ -97,10 +97,14 @@ Route::middleware([IsUserAuth::class])->group(function () {
     ]);
     });
     
+
     Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
         Route::post('logout', 'logout');
-        Route::get('user','getUser');
+        Route::get('user', 'getUser');
+        Route::patch('users/{id}/eliminar', 'eliminarUsuario');
+        Route::patch('users/{id}/toggle-bloqueado', 'toggleBloqueado');
     });
+
 
     Route::controller(DocumentoController::class)->group(function(){
         Route::get('documentos', 'getDoc');

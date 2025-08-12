@@ -25,6 +25,8 @@ class User extends Authenticatable implements JWTSubject{
         'password',
         'nombre_usuario',
         'id_rol',
+        'eliminado',
+        'bloqueado',
     ];
 
     // Ocultar estos campos cuando serialices el modelo (p. ej. al devolver JSON)
