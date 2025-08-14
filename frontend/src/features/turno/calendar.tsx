@@ -9,9 +9,10 @@ import type { DateClickArg } from "@fullcalendar/interaction";
 import type { EventClickArg } from "@fullcalendar/core/index.js";
 import type { Turno } from "./types/Turno";
 import DetailModal from "./DetailModal";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const CalendarPage = () => {
-  const { events, loading, refresh, addTurno,deleteTurno, updateTurno,finaliceTurno } = useTurnos();
+  const { events, loading, refresh, addTurno, deleteTurno, updateTurno, finaliceTurno } = useTurnos();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -24,50 +25,82 @@ const CalendarPage = () => {
   };
 
   const handleEventClick = (arg: EventClickArg) => {
-  const turno = arg.event.extendedProps.rawTurno as Turno;
-  setSelectedTurno(turno);
-  setDetailOpen(true);
-};
-  
-  if (loading) return <p>Cargando turnos…</p>;
+    const turno = arg.event.extendedProps.rawTurno as Turno;
+    setSelectedTurno(turno);
+    setDetailOpen(true);
+  };
+
+  const renderEventContent = (eventInfo: any) => {
+    const { rawTurno } = eventInfo.event.extendedProps;
+    
+    if (!rawTurno || !rawTurno.tratamiento || !rawTurno.paciente) {
+      return null;
+    }
+    
+    const totalDuration = rawTurno.tratamiento.duracion || 0;
+    const startDate = new Date(eventInfo.event.start);
+    const endDate = new Date(startDate.getTime() + totalDuration * 60_000);
+    
+    const formattedHoraInicio = `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`;
+    const formattedHoraFin = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
+    
+    const tratamiento = rawTurno.tratamiento.descripcion;
+
+    return (
+      <div className="p-1">
+        <div className="font-bold text-sm leading-tight text-white">{`${formattedHoraInicio} - ${formattedHoraFin}`}</div>
+        <div className="text-xs leading-tight text-white">
+          {rawTurno.paciente.nombre} {rawTurno.paciente.apellido}
+        </div>
+        {tratamiento && (
+          <div className="text-xs text-gray-200 mt-1">
+            {tratamiento}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ⬇️ Aquí cambiamos el mensaje por el spinner
+  if (loading) return <LoadingSpinner />;
 
   return (
-    
     <div className="container mx-auto p-4 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-6">Calendario</h1>
       <FullCalendar
-      plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-      initialView="timeGridWeek"
-      events={events}
-      dateClick={handleDateClick}    
-      eventClick={handleEventClick}           
-      editable={true}
-      selectable={true}
-      locale="es"
-      buttonText={{
-        today: "Hoy",
-        month: "Mes",
-        week: "Semana",
-        day: "Día",
-      }}
-      headerToolbar={{
-        left: "prev,next today",
-        center: "title",
-        right: "dayGridMonth,timeGridWeek,timeGridDay",
-      }}
-      slotDuration="00:30:00"
-      slotLabelInterval="00:30:00"
-      slotLabelFormat={{
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }}
-      slotMinTime="06:00:00"
-      slotMaxTime="22:00:00"
-      height="auto"
-    />
-    {isModalOpen && (
-       <AddTurno
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        initialView="timeGridWeek"
+        events={events}
+        dateClick={handleDateClick}
+        eventClick={handleEventClick}
+        editable={true}
+        selectable={true}
+        locale="es"
+        buttonText={{
+          today: "Hoy",
+          month: "Mes",
+          week: "Semana",
+          day: "Día",
+        }}
+        headerToolbar={{
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay",
+        }}
+        slotDuration="00:30:00"
+        slotLabelInterval="00:30:00"
+        slotLabelFormat={{
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }}
+        slotMinTime="06:00:00"
+        slotMaxTime="22:00:00"
+        height="auto"
+        eventContent={renderEventContent}
+      />
+      {isModalOpen && (
+        <AddTurno
           onClose={() => setIsModalOpen(false)}
           selectedDate={selectedDate}
           addTurno={addTurno}
@@ -75,19 +108,19 @@ const CalendarPage = () => {
       )}
 
       {selectedTurno && (
-  <DetailModal
-    turno={selectedTurno}
-    isOpen={detailOpen}
-    onClose={() => {
-      setDetailOpen(false);
-      setSelectedTurno(null);
-      refresh(); 
-    }}
-    onSave={updateTurno}
-    onDelete={deleteTurno}
-    onFinalize={finaliceTurno}
-  />
-)}
+        <DetailModal
+          turno={selectedTurno}
+          isOpen={detailOpen}
+          onClose={() => {
+            setDetailOpen(false);
+            setSelectedTurno(null);
+            refresh();
+          }}
+          onSave={updateTurno}
+          onDelete={deleteTurno}
+          onFinalize={finaliceTurno}
+        />
+      )}
     </div>
   );
 };

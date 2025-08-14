@@ -1,23 +1,29 @@
+import { useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+
 import Modal from '../../components/modal';
-import { useState } from 'react';
-import type { Tratamiento, TratamientoWithId } from './types/tratamiento';
 import ConfirmAction from '../../components/confirmAction';
+import LoadingSpinner from '../../components/LoadingSpinner';
+
 import useTratamientos from './hooks/useTratamientos';
-import TratamientoForm from './TratamientosForm';
-import TratamientoEditForm from './TratamientosEditForm';
 import useInsumos from '../insumo/hooks/useInsumos';
 
+import type { Tratamiento, TratamientoWithId } from './types/tratamiento';
+
+import TratamientoForm from './TratamientosForm';
+import TratamientoEditForm from './TratamientosEditForm';
+
 export default function TratamientoList() {
-  const { tratamientos, addTratamiento, deleteTratamiento, editTratamiento} = useTratamientos();
-  const {insumos} = useInsumos();
+  const { tratamientos, loading, addTratamiento, deleteTratamiento, editTratamiento } = useTratamientos();
+  const { insumos } = useInsumos();
+
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [selectedTratamiento, setSelectedTratamiento] = useState<TratamientoWithId | null>(null);
 
-  const handleAdd = (tratamiento: Tratamiento) => {
+  const handleAdd = async (tratamiento: Tratamiento) => {
     addTratamiento(tratamiento);
     setIsOpenAdd(false);
   };
@@ -32,87 +38,98 @@ export default function TratamientoList() {
     setIsOpenDelete(false);
   };
 
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <LoadingSpinner />
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Lista de Tratamientos</h2>
-      <button
-        onClick={() => setIsOpenAdd(true)}
-        className="bg-gray-500 hover:bg-gray-700 text-black font-bold py-2 px-4 rounded flex items-center gap-2 mb-6"
-      >
-        Agregar Tratamiento <FaPlus />
-      </button>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Lista de Tratamientos</h2>
+        <button
+          onClick={() => setIsOpenAdd(true)}
+          className="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mb-4"
+          disabled={loading}
+        >
+          Agregar Tratamiento <FaPlus />
+        </button>
 
-      <Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
-      <TratamientoForm
-        onSubmit={handleAdd} insumos={insumos}   
-      />      </Modal>
+        <Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
+          <TratamientoForm onSubmit={handleAdd} insumos={insumos} />
+        </Modal>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead className="text-center uppercase">
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Descripción</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Duración (min)</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Precio ($)</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Editar</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Eliminar</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="text-center">
-            {tratamientos.map((row) => (
-              <TableRow key={row.id_tratamiento}>
-                <TableCell>{row.descripcion}</TableCell>
-                <TableCell>{row.duracion}</TableCell>
-                <TableCell>{row.precio.toFixed(2)}</TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => {
-                      setSelectedTratamiento(row);
-                      setIsOpenEdit(true);
-                    }}
-                    className="text-blue-500 hover:text-blue-700 transition-all"
-                  >
-                    <FaEdit />
-                  </IconButton>
-                </TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => {
-                      setSelectedTratamiento(row);
-                      setIsOpenDelete(true);
-                    }}
-                    className="text-red-500 hover:text-red-700 transition-all"
-                  >
-                    <FaTrash />
-                  </IconButton>
-                </TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead className="bg-gray-50 uppercase">
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Descripción</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Duración (min)</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Precio ($)</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Editar</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Eliminar</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {tratamientos.map((row) => (
+                <TableRow key={row.id_tratamiento}>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.descripcion}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.duracion}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.precio.toFixed(2)}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    <IconButton
+                      onClick={() => {
+                        setSelectedTratamiento(row);
+                        setIsOpenEdit(true);
+                      }}
+                      className="text-blue-600 hover:text-blue-900 transition-all"
+                      disabled={loading}
+                    >
+                      <FaEdit />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    <IconButton
+                      onClick={() => {
+                        setSelectedTratamiento(row);
+                        setIsOpenDelete(true);
+                      }}
+                      className="text-red-600 hover:text-red-900 transition-all"
+                      disabled={loading}
+                    >
+                      <FaTrash />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
 
-        {isOpenEdit && selectedTratamiento && (
-          <Modal isOpen={isOpenEdit} onClose={() => setIsOpenEdit(false)}>
+      {isOpenEdit && selectedTratamiento && (
+        <Modal isOpen={isOpenEdit} onClose={() => setIsOpenEdit(false)}>
           <TratamientoEditForm
-                insumos={insumos}         
-                tratamiento={selectedTratamiento}
-                onSubmit={(updated) => {
-                  handleEdit(updated);
-                  setIsOpenEdit(false);
-                }}
-              />
-          </Modal>
-        )}
-
-        {isOpenDelete && selectedTratamiento && (
-          <ConfirmAction
-            onConfirm={() => {
-              handleDelete(selectedTratamiento.id_tratamiento);
+            insumos={insumos}
+            tratamiento={selectedTratamiento}
+            onSubmit={(updated) => {
+              handleEdit(updated);
+              setIsOpenEdit(false);
             }}
-            onCancel={() => setIsOpenDelete(false)}
           />
-        )}
-      </TableContainer>
+        </Modal>
+      )}
+
+      {isOpenDelete && selectedTratamiento && (
+        <ConfirmAction
+          onConfirm={() => {
+            handleDelete(selectedTratamiento.id_tratamiento);
+            setIsOpenDelete(false);
+          }}
+          onCancel={() => setIsOpenDelete(false)}
+        />
+      )}
     </div>
-);
+  );
 }

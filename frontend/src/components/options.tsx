@@ -7,9 +7,13 @@ interface MenuItemProps {
 
 const Options: React.FC<MenuItemProps> = ({ icon, label }) => {
   return (
-    <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
-      {icon}
-      <span className="ml-2">{label}</span>
+    <div className="flex items-center gap-2 p-2">
+      {/* Contenedor para el icono con ancho fijo */}
+      <div className="w-6 flex-shrink-0 flex justify-center items-center">
+        {icon}
+      </div>
+      {/* Contenedor para el texto */}
+      <span className="leading-none">{label}</span>
     </div>
   );
 };

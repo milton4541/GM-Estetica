@@ -2,62 +2,71 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import useFactura from './hooks/useFactura';
 import usePacients from '../paciente/hooks/usePacient';
 import useTratamientos from '../tratamiento/hooks/useTratamientos';
+import LoadingSpinner from '../../components/LoadingSpinner'; // ajusta el path si hace falta
 
 export default function FacturaList() {
-  const {factura} = useFactura()
-  const {pacient} = usePacients()
-  const {tratamientos} = useTratamientos()
+  const { factura, loading } = useFactura();
+  const { pacient } = usePacients();
+  const { tratamientos } = useTratamientos();
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Lista de Facturas</h2>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Lista de Facturas</h2>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead className="text-center uppercase">
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Codigo Factura</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Importe</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Descuento Precio</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Descuento Porcentaje</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Importe Final</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Paciente</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Tratamiento</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Fecha</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className="text-center">
-            {factura.map(row => {
-              const pac = pacient.find(p => p.id_paciente === row.id_paciente)
-              const trat = tratamientos.find(t => t.id_tratamiento === row.id_tratamiento)
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead className="bg-gray-50 uppercase">
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Codigo Factura</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Importe</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Descuento Precio</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Descuento Porcentaje</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Importe Final</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Paciente</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Tratamiento</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Fecha</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {factura.map(row => {
+                const pac = pacient.find(p => p.id_paciente === row.id_paciente);
+                const trat = tratamientos.find(t => t.id_tratamiento === row.id_tratamiento);
 
-              return (
-                <TableRow key={row.factura_id}>
-                  <TableCell>{row.factura_id}</TableCell>
-                  <TableCell>{row.importe}</TableCell>
-                  <TableCell>${row.descuento_precio}</TableCell>
-                  <TableCell>{row.descuento_porcentaje}%</TableCell>
-                  <TableCell>{row.importe_final}</TableCell>
+                return (
+                  <TableRow key={row.factura_id}>
+                    <TableCell sx={{ padding: '8px 16px' }}>{row.factura_id}</TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>{row.importe}</TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>${row.descuento_precio}</TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>{row.descuento_porcentaje}%</TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>{row.importe_final}</TableCell>
 
-                  <TableCell>
-                    {pac ? `${pac.nombre} ${pac.apellido}` : '—'}
-                  </TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>
+                      {pac ? `${pac.nombre} ${pac.apellido}` : '—'}
+                    </TableCell>
 
-                  <TableCell>
-                    {trat ? trat.descripcion : '—'}
-                  </TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>
+                      {trat ? trat.descripcion : '—'}
+                    </TableCell>
 
-                  <TableCell>
-                    {new Date(row.created_at).toLocaleDateString('es-AR')}
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-
-        </Table>
-      </TableContainer>
+                    <TableCell sx={{ padding: '8px 16px' }}>
+                      {new Date(row.created_at).toLocaleDateString('es-AR')}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </div>
   );
 }

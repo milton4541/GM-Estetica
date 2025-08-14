@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faScissors } from '@fortawesome/free-solid-svg-icons';
 import { useLogin } from './hooks/useLogin';
+import loginImage from '../../imagenes/login2.png';
 
 
 export default function Login() {
@@ -8,15 +9,19 @@ export default function Login() {
   const { username, setUsername, password, setPassword, handleSubmit } = useLogin();
 
   return (
-    
     <div className="flex h-screen">
       
-      <div className="w-[30%] bg-gray-900 flex flex-col items-center justify-center text-white p-4">
-        <FontAwesomeIcon icon={faScissors} size="3x" />
-        <h1 className="text-3xl font-bold mb-2">Bienvenido</h1>
-        <p className="text-xl text-center">Estetica GM</p>
+      {/* Nuevo enfoque para el panel izquierdo */}
+      <div 
+        className="w-[30%] bg-cover bg-center" // Usamos bg-cover y bg-center de Tailwind
+        style={{ backgroundImage: `url(${loginImage})` }} // El estilo en línea para la imagen de fondo
+      >
+        {/* Este div es para el contenido (texto) que va sobre la imagen */}
+        <div className="flex flex-col items-center justify-center h-full text-white p-4">
+        </div>
       </div>
-
+      
+      {/* El panel derecho no cambia */}
       <div className="w-[70%] flex items-center justify-center bg-white p-8">
         <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-lg">
           <div className="space-y-2">
@@ -58,7 +63,5 @@ export default function Login() {
         </form>
       </div>
     </div>
-
-
-  )
+  );
 }

@@ -14,12 +14,15 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TurnoController;
 use App\Http\Controllers\Api\TratamientoInsumoController;
 use App\Http\Controllers\Api\ReporteAdministrativoController;
-
+ 
 
 //rutas publicas
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
 Route::post('rol',[AuthController::class,'createRol']);
+Route::get('getRol',[AuthController::class,'getRoles']);
+Route::get('getUsuarios',[AuthController::class,'getUsuarios']);
+
 
 //rutas privadas (necesitas auth)
 Route::middleware([IsUserAuth::class])->group(function () {
@@ -97,10 +100,14 @@ Route::middleware([IsUserAuth::class])->group(function () {
     ]);
     });
     
+
     Route::controller(AuthController::class)->middleware('auth:api')->group(function () {
         Route::post('logout', 'logout');
-        Route::get('user','getUser');
+        Route::get('user', 'getUser');
+        Route::patch('users/{id}/eliminar', 'eliminarUsuario');
+        Route::patch('users/{id}/toggle-bloqueado', 'toggleBloqueado');
     });
+
 
     Route::controller(DocumentoController::class)->group(function(){
         Route::get('documentos', 'getDoc');

@@ -1,61 +1,61 @@
 // src/historial/hooks/useHistorial.ts
-import { useState, useEffect } from 'react'
-import type { HistorialItem } from '../types/historial'
-import { getHistorial } from '../api/getHistorial'
-import { getHistorialByPaciente } from '../api/getHistorialByPaciente'
-import { getHistorialByTratamiento } from '../api/getHistorialByTratamiento'
+import { useState, useCallback, useEffect } from 'react';
+import type { HistorialItem } from '../types/historial';
+import { getHistorial } from '../api/getHistorial';
+import { getHistorialByPaciente } from '../api/getHistorialByPaciente';
+import { getHistorialByTratamiento } from '../api/getHistorialByTratamiento';
 
 export default function useHistorial() {
-  const [historial, setHistorial] = useState<HistorialItem[]>([])
-  const [loading, setLoading]       = useState(false)
-  const [error, setError]           = useState<string|null>(null)
+  const [historial, setHistorial] = useState<HistorialItem[]>([]);
+  const [loading, setLoading]      = useState(false);
+  const [error, setError]          = useState<string | null>(null);
 
-  // 1) Traer todo
-  const fetchHistorial = async () => {
-    setLoading(true)
-    setError(null)
+  // 1) Traer todo - envuelto en useCallback para memorizar la función
+  const fetchHistorial = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const data = await getHistorial()
-      setHistorial(data)
+      const data = await getHistorial();
+      setHistorial(data);
     } catch (err) {
-      setError((err as Error).message)
+      setError((err as Error).message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []); // El array de dependencias está vacío, la función no cambiará.
 
-  // 2) Filtrar por paciente
-  const fetchByPaciente = async (pacienteId: number) => {
-    setLoading(true)
-    setError(null)
+  // 2) Filtrar por paciente - envuelto en useCallback
+  const fetchByPaciente = useCallback(async (pacienteId: number) => {
+    setLoading(true);
+    setError(null);
     try {
-      const data = await getHistorialByPaciente(pacienteId)
-      setHistorial(data)
+      const data = await getHistorialByPaciente(pacienteId);
+      setHistorial(data);
     } catch (err) {
-      setError((err as Error).message)
+      setError((err as Error).message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []); // El array de dependencias está vacío.
 
-  // 3) Filtrar por tratamiento
-  const fetchByTratamiento = async (tratamientoId: number) => {
-    setLoading(true)
-    setError(null)
+  // 3) Filtrar por tratamiento - envuelto en useCallback
+  const fetchByTratamiento = useCallback(async (tratamientoId: number) => {
+    setLoading(true);
+    setError(null);
     try {
-      const data = await getHistorialByTratamiento(tratamientoId)
-      setHistorial(data)
+      const data = await getHistorialByTratamiento(tratamientoId);
+      setHistorial(data);
     } catch (err) {
-      setError((err as Error).message)
+      setError((err as Error).message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []); // El array de dependencias está vacío.
 
   // Carga inicial
   useEffect(() => {
-    fetchHistorial()
-  }, [])
+    fetchHistorial();
+  }, [fetchHistorial]); // Ahora, esta dependencia es estable gracias a useCallback.
 
   return {
     historial,
@@ -63,6 +63,6 @@ export default function useHistorial() {
     error,
     fetchHistorial,
     fetchByPaciente,
-    fetchByTratamiento
-  }
+    fetchByTratamiento,
+  };
 }

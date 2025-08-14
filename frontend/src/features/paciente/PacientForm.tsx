@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import type { Pacient } from "./types/pacient";
+import React, { useState } from "react"; // Asegúrate de importar React y useState
+import LoadingSpinner from '../../components/LoadingSpinner'; // Asegúrate de que la ruta sea correcta
 
 interface PacientFormProps {
-  onSubmit: (pacient: Pacient) => void;
+  onSubmit: (pacient: Pacient) => Promise<void>;
 }
 
 const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
@@ -13,9 +15,19 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
     formState: { errors },
   } = useForm<Pacient>();
 
-  const onFormSubmit = (data: Pacient) => {
-    onSubmit(data);
-    reset();
+  const [loading, setLoading] = useState(false); // Nuevo estado para el spinner
+
+  const onFormSubmit = async (data: Pacient) => {
+    setLoading(true); // Activa el spinner
+    try {
+      await onSubmit(data);
+      reset();
+    } catch (e) {
+      console.error(e);
+      // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario.
+    } finally {
+      setLoading(false); // Desactiva el spinner, sin importar si hubo éxito o error
+    }
   };
 
   return (
@@ -28,7 +40,7 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
         <div className="grid gap-4 mb-4 grid-cols-2">
           {/* DNI */}
           <div className="col-span-2 sm:col-span-1">
-            <label htmlFor="dni" className="block mb-2 text-sm font-medium text-gray-900">
+            <label htmlFor="dni_paciente" className="block mb-2 text-sm font-medium text-gray-900">
               DNI
             </label>
             <input
@@ -41,6 +53,7 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
                 errors.dni_paciente ? "border-red-500" : "border-gray-300"
               } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="12345678"
+              disabled={loading} // Deshabilita el input cuando se está cargando
             />
             {errors.dni_paciente && (
               <p className="text-red-500 text-sm mt-1">{errors.dni_paciente.message}</p>
@@ -59,6 +72,7 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
                 errors.nombre ? "border-red-500" : "border-gray-300"
               } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Mario"
+              disabled={loading} // Deshabilita el input cuando se está cargando
             />
             {errors.nombre && <p className="text-red-500 text-sm mt-1">{errors.nombre.message}</p>}
           </div>
@@ -75,6 +89,7 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
                 errors.apellido ? "border-red-500" : "border-gray-300"
               } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Mendez"
+              disabled={loading} // Deshabilita el input cuando se está cargando
             />
             {errors.apellido && <p className="text-red-500 text-sm mt-1">{errors.apellido.message}</p>}
           </div>
@@ -94,6 +109,7 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
                 errors.telefono ? "border-red-500" : "border-gray-300"
               } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="3434655099"
+              disabled={loading} // Deshabilita el input cuando se está cargando
             />
             {errors.telefono && <p className="text-red-500 text-sm mt-1">{errors.telefono.message}</p>}
           </div>
@@ -113,6 +129,7 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
                 errors.email ? "border-red-500" : "border-gray-300"
               } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="paciente@example.com"
+              disabled={loading} // Deshabilita el input cuando se está cargando
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
@@ -129,6 +146,7 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
                 errors.obra_social ? "border-red-500" : "border-gray-300"
               } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="IOSPER, OSDE, etc."
+              disabled={loading} // Deshabilita el input cuando se está cargando
             />
             {errors.obra_social && (
               <p className="text-red-500 text-sm mt-1">{errors.obra_social.message}</p>
@@ -139,15 +157,22 @@ const PacientForm: React.FC<PacientFormProps> = ({ onSubmit }) => {
         <button
           type="submit"
           className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          disabled={loading} // Deshabilita el botón cuando se está cargando
         >
-          <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Agregar Paciente
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Agregar Paciente
+            </>
+          )}
         </button>
       </form>
     </div>

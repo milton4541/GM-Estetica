@@ -25,6 +25,8 @@ class User extends Authenticatable implements JWTSubject{
         'password',
         'nombre_usuario',
         'id_rol',
+        'eliminado',
+        'bloqueado',
     ];
 
     // Ocultar estos campos cuando serialices el modelo (p. ej. al devolver JSON)
@@ -46,7 +48,7 @@ class User extends Authenticatable implements JWTSubject{
      */
     public function rol()
     {
-        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+        return $this->belongsTo(Rol::class, 'id_rol', 'id');
     }
     public function getAuthIdentifierName()
     {
