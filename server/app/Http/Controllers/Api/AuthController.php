@@ -131,7 +131,7 @@ public function register(Request $request)
  *     )
  * )
  */
-    public function login(Request $request)
+public function login(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'nombre_usuario' => 'required|string',
@@ -158,24 +158,32 @@ public function register(Request $request)
     // Usuario autenticado
     $user = JWTAuth::user() ?? JWTAuth::setToken($token)->toUser();
 
-    // Cargar relación rol (usa rols.id)
-    $user->loadMissing('rol'); // o: ->loadMissing('rol:id,nombre_rol');
+    // Verificar si está bloqueado o eliminado
+    if ($user->bloqueado || $user->eliminado) {
+        return response()->json([
+            'error' => 'El usuario está bloqueado o eliminado. Contacte al administrador.',
+        ], 403); // Forbidden
+    }
+
+    // Cargar relación rol
+    $user->loadMissing('rol');
 
     return response()->json([
         'access_token' => $token,
         'token_type'   => 'bearer',
         'expires_in'   => auth('api')->factory()->getTTL() * 60,
         'user'         => [
-            'id_usuario'      => $user->id_usuario,                 // tu PK real
+            'id_usuario'      => $user->id_usuario,
             'nombre'          => $user->nombre,
             'apellido'        => $user->apellido,
             'nombre_usuario'  => $user->nombre_usuario,
             'email'           => $user->email,
-            'id_rol'          => $user->id_rol,                     // FK en users
-            'rol'             => optional($user->rol)->nombre_rol,  // nombre legible
+            'id_rol'          => $user->id_rol,
+            'rol'             => optional($user->rol)->nombre_rol,
         ],
     ]);
 }
+
 /**
  * @OA\Get(
  *     path="/api/user",
@@ -368,6 +376,28 @@ public function toggleBloqueado($id)
         'message' => 'Estado bloqueado cambiado correctamente',
         'data'    => $user
     ]);
+}
+
+public function getRoles(): JsonResponse
+{
+    $roles = Rol::all();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Listado de roles',
+        'data'    => $roles,
+    ], 200);
+}
+
+public function getUsuarios(): JsonResponse
+{
+$users = User::where('eliminado', false)->get();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Listado de usuarios',
+        'data'    => $users,
+    ], 200);
 }
 
 }
