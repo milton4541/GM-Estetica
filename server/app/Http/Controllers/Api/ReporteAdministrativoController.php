@@ -65,9 +65,23 @@ class ReporteAdministrativoController extends Controller
     /**
      * @OA\Get(
      *     path="/api/reportes/ingresos-totales",
-     *     summary="Obtener el total de ingresos del sistema",
+     *     summary="Obtener el total de ingresos del sistema (con rango de fechas opcional)",
      *     tags={"Reportes administrativos"},
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="fecha_inicio",
+     *         in="query",
+     *         description="Fecha de inicio (YYYY-MM-DD)",
+     *         required=false,
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="fecha_fin",
+     *         in="query",
+     *         description="Fecha de fin (YYYY-MM-DD)",
+     *         required=false,
+     *         @OA\Schema(type="string", format="date")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Ingresos totales calculados correctamente",
@@ -75,47 +89,104 @@ class ReporteAdministrativoController extends Controller
      *     )
      * )
      */
-    public function ingresosTotales()
-    {
-        $total = Factura::sum('importe_final');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Ingresos totales calculados correctamente',
-            'total' => $total,
-        ], 200);
+    /* se puede filtrar por rango de fechas, Finicio y Ffin*/ 
+public function ingresosTotales(Request $request)
+{
+    $query = Factura::query();
+
+    // ✅ Soporta inicio/fin opcionales
+    if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+        $query->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin]);
+    } elseif ($request->filled('fecha_inicio')) {
+        $query->whereDate('created_at', '>=', $request->fecha_inicio);
+    } elseif ($request->filled('fecha_fin')) {
+        $query->whereDate('created_at', '<=', $request->fecha_fin);
     }
+
+    $total = (float) $query->sum('importe_final');
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Ingresos totales calculados correctamente',
+        'total'   => $total,
+    ], 200);
+}
 
     /**
      * @OA\Get(
      *     path="/api/reportes/ingresos-totales-pdf",
-     *     summary="Generar y descargar reporte PDF de ingresos totales",
+     *     summary="Generar y descargar reporte PDF de ingresos totales (con rango de fechas opcional)",
      *     tags={"Reportes administrativos"},
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="fecha_inicio",
+     *         in="query",
+     *         description="Fecha de inicio (YYYY-MM-DD)",
+     *         required=false,
+     *         @OA\Schema(type="string", format="date")
+     *     ),
+     *     @OA\Parameter(
+     *         name="fecha_fin",
+     *         in="query",
+     *         description="Fecha de fin (YYYY-MM-DD)",
+     *         required=false,
+     *         @OA\Schema(type="string", format="date")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Archivo PDF descargado correctamente",
-     *         @OA\MediaType(
-     *             mediaType="application/pdf"
-     *         )
+     *         @OA\MediaType(mediaType="application/pdf")
      *     )
      * )
      */
-    public function exportarIngresosTotalesPdf()
-    {
-        $total = Factura::sum('importe_final');
+    public function exportarIngresosTotalesPdf(Request $request)
+{
+    try {
+        $query = Factura::query();
 
-        $pdf = Pdf::loadView('pdfs.ingresos_totales', compact('total'));
+        // ✅ Mismo criterio de filtros que el JSON
+        if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+            $query->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin]);
+        } elseif ($request->filled('fecha_inicio')) {
+            $query->whereDate('created_at', '>=', $request->fecha_inicio);
+        } elseif ($request->filled('fecha_fin')) {
+            $query->whereDate('created_at', '<=', $request->fecha_fin);
+        }
+
+        $total = (float) $query->sum('importe_final');
+
+        // ✅ Enviamos las 3 variables que el Blade necesita
+        $pdf = Pdf::loadView('pdfs.ingresos_totales', [
+            'total'        => $total,
+            'fechaInicio'  => $request->input('fecha_inicio'), // <-- nombre que usa tu Blade
+            'fechaFin'     => $request->input('fecha_fin'),    // <-- nombre que usa tu Blade
+        ]);
 
         return $pdf->download('ingresos_totales.pdf');
+    } catch (\Throwable $e) {
+        Log::error('PDF ingresos totales - error', ['msg' => $e->getMessage()]);
+        return response()->json([
+            'success' => false,
+            'message' => 'No se pudo generar el PDF de ingresos totales.',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
 
     /**
      * @OA\Get(
      *     path="/api/reportes/ingresos-mensuales",
-     *     summary="Obtener ingresos totales agrupados por mes",
+     *     summary="Obtener ingresos totales agrupados por mes (filtrar por mes opcional)",
      *     tags={"Reportes administrativos"},
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="mes",
+     *         in="query",
+     *         description="Mes en formato YYYY-MM",
+     *         required=false,
+     *         @OA\Schema(type="string", example="2025-07")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Ingresos mensuales obtenidos correctamente",
@@ -123,12 +194,19 @@ class ReporteAdministrativoController extends Controller
      *     )
      * )
      */
-    public function ingresosPorMes()
+
+    /*se filtra por mes en formato año/mes */
+    public function ingresosPorMes(Request $request)
     {
-        $ingresos = Factura::selectRaw("strftime('%Y-%m', created_at) as mes, sum(importe_final) as total")
+        $query = Factura::selectRaw("strftime('%Y-%m', created_at) as mes, sum(importe_final) as total")
             ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
+            ->orderBy('mes');
+
+        if ($request->filled('mes')) {
+            $query->having('mes', '=', $request->mes);
+        }
+
+        $ingresos = $query->get();
 
         return response()->json([
             'success' => true,
@@ -140,24 +218,34 @@ class ReporteAdministrativoController extends Controller
     /**
      * @OA\Get(
      *     path="/api/reportes/ingresos-mensuales-pdf",
-     *     summary="Generar y descargar reporte PDF de ingresos mensuales",
+     *     summary="Generar y descargar reporte PDF de ingresos mensuales (filtrar por mes opcional)",
      *     tags={"Reportes administrativos"},
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="mes",
+     *         in="query",
+     *         description="Mes en formato YYYY-MM",
+     *         required=false,
+     *         @OA\Schema(type="string", example="2025-07")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Archivo PDF descargado correctamente",
-     *         @OA\MediaType(
-     *             mediaType="application/pdf"
-     *         )
+     *         @OA\MediaType(mediaType="application/pdf")
      *     )
      * )
      */
-    public function exportarIngresosMensualesPdf()
+    public function exportarIngresosMensualesPdf(Request $request)
     {
-        $ingresos = Factura::selectRaw("strftime('%Y-%m', created_at) as mes, sum(importe_final) as total")
+        $query = Factura::selectRaw("strftime('%Y-%m', created_at) as mes, sum(importe_final) as total")
             ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
+            ->orderBy('mes');
+
+        if ($request->filled('mes')) {
+            $query->having('mes', '=', $request->mes);
+        }
+
+        $ingresos = $query->get();
 
         $pdf = Pdf::loadView('pdfs.ingresos_mensuales', compact('ingresos'));
 
@@ -167,9 +255,16 @@ class ReporteAdministrativoController extends Controller
     /**
      * @OA\Get(
      *     path="/api/reportes/rendimiento-tratamientos",
-     *     summary="Obtener ingresos generados por cada tratamiento",
+     *     summary="Obtener ingresos generados por cada tratamiento (filtrar por nombre opcional)",
      *     tags={"Reportes administrativos"},
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="tratamiento",
+     *         in="query",
+     *         description="Nombre o parte del nombre del tratamiento",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Limpieza")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Rendimiento por tratamiento generado correctamente",
@@ -177,14 +272,20 @@ class ReporteAdministrativoController extends Controller
      *     )
      * )
      */
-    public function rendimientoPorTratamiento()
+
+    public function rendimientoPorTratamiento(Request $request)
     {
-        $rendimiento = DB::table('factura')
+        $query = DB::table('factura')
             ->join('tratamiento', 'tratamiento.id_tratamiento', '=', 'factura.id_tratamiento')
             ->select('tratamiento.descripcion as tratamiento', DB::raw('SUM(factura.importe_final) as ingreso_total'))
             ->groupBy('tratamiento.descripcion')
-            ->orderByDesc('ingreso_total')
-            ->get();
+            ->orderByDesc('ingreso_total');
+
+        if ($request->filled('tratamiento')) {
+            $query->where('tratamiento.descripcion', 'LIKE', '%' . $request->tratamiento . '%');
+        }
+
+        $rendimiento = $query->get();
 
         return response()->json([
             'success' => true,
@@ -196,26 +297,36 @@ class ReporteAdministrativoController extends Controller
     /**
      * @OA\Get(
      *     path="/api/reportes/rendimiento-tratamientos-pdf",
-     *     summary="Generar y descargar reporte PDF de rendimiento por tratamiento",
+     *     summary="Generar y descargar reporte PDF de rendimiento por tratamiento (filtrar por nombre opcional)",
      *     tags={"Reportes administrativos"},
      *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="tratamiento",
+     *         in="query",
+     *         description="Nombre o parte del nombre del tratamiento",
+     *         required=false,
+     *         @OA\Schema(type="string", example="Limpieza")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Archivo PDF descargado correctamente",
-     *         @OA\MediaType(
-     *             mediaType="application/pdf"
-     *         )
+     *         @OA\MediaType(mediaType="application/pdf")
      *     )
      * )
      */
-    public function exportarRendimientoTratamientosPdf()
+    public function exportarRendimientoTratamientosPdf(Request $request)
     {
-    $rendimiento = DB::table('facturas')
-        ->join('tratamientos', 'tratamientos.id_tratamiento', '=', 'facturas.id_tratamiento')
-        ->select('tratamientos.descripcion as tratamiento', DB::raw('SUM(facturas.importe_final) as ingreso_total'))
-        ->groupBy('tratamientos.descripcion')
-        ->orderByDesc('ingreso_total')
-        ->get();
+        $query = DB::table('facturas')
+            ->join('tratamientos', 'tratamientos.id_tratamiento', '=', 'facturas.id_tratamiento')
+            ->select('tratamientos.descripcion as tratamiento', DB::raw('SUM(facturas.importe_final) as ingreso_total'))
+            ->groupBy('tratamientos.descripcion')
+            ->orderByDesc('ingreso_total');
+
+        if ($request->filled('tratamiento')) {
+            $query->where('tratamientos.descripcion', 'LIKE', '%' . $request->tratamiento . '%');
+        }
+
+        $rendimiento = $query->get();
 
         $pdf = Pdf::loadView('pdfs.rendimiento_tratamientos', compact('rendimiento'));
 
