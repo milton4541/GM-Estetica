@@ -131,7 +131,7 @@ public function register(Request $request)
  *     )
  * )
  */
-    public function login(Request $request)
+public function login(Request $request)
 {
     $validator = Validator::make($request->all(), [
         'nombre_usuario' => 'required|string',
@@ -158,24 +158,31 @@ public function register(Request $request)
     // Usuario autenticado
     $user = JWTAuth::user() ?? JWTAuth::setToken($token)->toUser();
 
-    // Cargar relación rol (usa rols.id)
-    $user->loadMissing('rol'); // o: ->loadMissing('rol:id,nombre_rol');
+    if ($user->bloqueado || $user->eliminado) {
+        return response()->json([
+            'error' => 'El usuario está bloqueado o eliminado. Contacte al administrador.',
+        ], 403); // Forbidden
+    }
+
+    // Cargar relación rol
+    $user->loadMissing('rol');
 
     return response()->json([
         'access_token' => $token,
         'token_type'   => 'bearer',
         'expires_in'   => auth('api')->factory()->getTTL() * 60,
         'user'         => [
-            'id_usuario'      => $user->id_usuario,                 // tu PK real
+            'id_usuario'      => $user->id_usuario,
             'nombre'          => $user->nombre,
             'apellido'        => $user->apellido,
             'nombre_usuario'  => $user->nombre_usuario,
             'email'           => $user->email,
-            'id_rol'          => $user->id_rol,                     // FK en users
-            'rol'             => optional($user->rol)->nombre_rol,  // nombre legible
+            'id_rol'          => $user->id_rol,
+            'rol'             => optional($user->rol)->nombre_rol,
         ],
     ]);
 }
+
 /**
  * @OA\Get(
  *     path="/api/user",
@@ -271,7 +278,106 @@ public function logout()
         ], 201);
     }
 
-    public function getRoles(): JsonResponse
+/**
+ * @OA\Patch(
+ *     path="/api/users/{id}/eliminar",
+ *     summary="Marcar usuario como eliminado",
+ *     tags={"Usuarios"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID del usuario",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Usuario marcado como eliminado",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Usuario marcado como eliminado"),
+ *             @OA\Property(property="data", type="object",
+ *                 @OA\Property(property="id_usuario", type="integer", example=1),
+ *                 @OA\Property(property="eliminado", type="boolean", example=true)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=404, description="Usuario no encontrado")
+ * )
+ */
+public function eliminarUsuario($id)
+{
+    $user = User::find($id);
+
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Usuario no encontrado'
+        ], 404);
+    }
+
+    $user->eliminado = true;
+    $user->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Usuario marcado como eliminado',
+        'data'    => $user
+    ]);
+}
+
+
+/**
+ * @OA\Patch(
+ *     path="/api/users/{id}/toggle-bloqueado",
+ *     summary="Alternar estado bloqueado del usuario",
+ *     tags={"Usuarios"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID del usuario",
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Estado bloqueado actualizado",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="success", type="boolean", example=true),
+ *             @OA\Property(property="message", type="string", example="Estado bloqueado cambiado correctamente"),
+ *             @OA\Property(property="data", type="object",
+ *                 @OA\Property(property="id_usuario", type="integer", example=1),
+ *                 @OA\Property(property="bloqueado", type="boolean", example=false)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=404, description="Usuario no encontrado")
+ * )
+ */
+public function toggleBloqueado($id)
+{
+    $user = User::find($id);
+
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Usuario no encontrado'
+        ], 404);
+    }
+
+    $user->bloqueado = !$user->bloqueado;
+    $user->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Estado bloqueado cambiado correctamente',
+        'data'    => $user
+    ]);
+}
+
+public function getRoles(): JsonResponse
 {
     $roles = Rol::all();
 
@@ -282,13 +388,15 @@ public function logout()
     ], 200);
 }
 
-   public function getUsuarios()
-    {
-        $user = User::all();
-        return response()->json([
+public function getUsuarios(): JsonResponse
+{
+$users = User::where('eliminado', false)->get();
+
+    return response()->json([
         'success' => true,
-        'message' => 'Listado de roles',
-        'data'    => $user,
-    ], 200);    }
+        'message' => 'Listado de usuarios',
+        'data'    => $users,
+    ], 200);
+}
 
 }

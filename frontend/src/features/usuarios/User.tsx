@@ -1,12 +1,17 @@
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
- Tabs, Tab, CircularProgress
+  Tabs, Tab, CircularProgress, IconButton, Tooltip,
+  Chip
 } from '@mui/material';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaLock, FaUnlock } from 'react-icons/fa';
 import { useEffect, useMemo, useState } from 'react';
 import Modal from '../../components/modal';
+import ConfirmAction from '../../components/confirmAction'; // 👈 tu modal de confirmar
 import api from '../../utils/axios';
 import UsuarioForm, { type RegisterPayload } from './UserAddModal';
+import { showNotification } from '../../utils/showNotification';
+import axios from 'axios';
+
 // -------------------- Tipos --------------------
 type Rol = {
   id: number;
@@ -20,36 +25,66 @@ type Usuario = {
   email: string;
   nombre_usuario: string;
   id_rol: number;
+  bloqueado?: boolean;
+  is_bloqueado?: boolean;
+  estado?: string;
   created_at?: string;
   updated_at?: string;
 };
+
 type ApiListResponse<T> = {
   success: boolean;
   message: string;
   data: T;
 };
 
-const authHeaders = () => {
-  const token = localStorage.getItem('authToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
 
+async function deleteUsuarioAPI(id: number) {
+  try {
+    const token = localStorage.getItem('authToken');
+    console.log('token', token?.slice(0, 12)); // debug
+    const res = await api.patch(`/users/${id}/eliminar`, null, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message || 'Error al eliminar usuario');
+    }
+    throw new Error('Ocurrió un error inesperado');
+  }
+}
+
+async function toggleBloqueadoAPI(id: number) {
+  const token = localStorage.getItem('authToken');
+  return api.patch(`/users/${id}/toggle-bloqueado`, null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+    },
+  });
+}
 
 // -------------------- Hooks de datos --------------------
-export function useRoles() {
+ function useRoles() {
   const [roles, setRoles] = useState<Rol[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string|null>(null);
 
   const fetchRoles = async () => {
     try {
+      const token = localStorage.getItem('authToken');
       setLoading(true);
       setError(null);
-
       const resp = await api.get<ApiListResponse<Rol[]>>('/getRol', {
-        headers: authHeaders(),
-      });
-      console.log('API /getRol ->', resp.data);
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
       setRoles(resp.data.data ?? []);
     } catch (err: any) {
@@ -61,10 +96,7 @@ export function useRoles() {
     }
   };
 
-  useEffect(() => {
-    fetchRoles();
-  }, []);
-
+  useEffect(() => { fetchRoles(); }, []);
   return { roles, loading, error };
 }
 
@@ -74,36 +106,40 @@ function useUsuarios() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchUsuarios = async () => {
-  try {
-    setLoading(true);
-    setError(null);
+    try {
+      const token = localStorage.getItem('authToken');
+      setLoading(true);
+      setError(null);
+      const resp = await api.get<ApiListResponse<Usuario[]>>('/getUsuarios',{ headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+      setUsuarios(resp.data.data ?? []);
+    } catch (err: any) {
+      console.error('Error /getUsuarios', err?.response?.data || err);
+      setError(err?.response?.data?.message || 'No se pudieron cargar los usuarios');
+      setUsuarios([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const resp = await api.get<ApiListResponse<Usuario[]>>('/getUsuarios', { headers: authHeaders() });
-    console.log('API /getUsuarios ->', resp.data); // <-- log de la respuesta real
-
-    setUsuarios(resp.data.data ?? []);             // <-- usar el array
-  } catch (err: any) {
-    console.error('Error /getUsuarios', err?.response?.data || err);
-    setError(err?.response?.data?.message || 'No se pudieron cargar los usuarios');
-    setUsuarios([]); // evita quedar con shape inválido
-  } finally {
-    setLoading(false);
-  }
-};
-
-  useEffect(() => {
-    fetchUsuarios();
-  }, []);
-
+  useEffect(() => { fetchUsuarios(); }, []);
   return { usuarios, loading, error, refreshUsuarios: fetchUsuarios };
 }
 
 export default function UsuariosView() {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+
   const [tab, setTab] = useState<'usuarios' | 'roles'>('usuarios');
 
   const { usuarios, loading: loadingUsuarios, error: errorUsuarios, refreshUsuarios } = useUsuarios();
   const { roles, loading: loadingRoles, error: errorRoles } = useRoles();
+
+  // Acciones (delete/toggle)
+  const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [confirm, setConfirm] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
 
   const roleMap = useMemo(() => {
     const m = new Map<number, string>();
@@ -112,17 +148,53 @@ export default function UsuariosView() {
   }, [roles]);
 
   const handleAddUser = async (payload: RegisterPayload) => {
-  // Si usás token:
-  const headers: any = {};
-  const token = localStorage.getItem('authToken');
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  // POST /register  -> { message, user }
-  await api.post('/register', payload, { headers });
-  await refreshUsuarios();
-  setIsOpenAdd(false);
-};
+    const token = localStorage.getItem('authToken');
+    await api.post('/register', payload,             {
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    await refreshUsuarios();
+    setIsOpenAdd(false);
+  };
   const handleOpenAdd = () => setIsOpenAdd(true);
+
+const isUsuarioBloqueado = (u: Usuario) => Number(u.bloqueado) === 1;
+
+  // Acciones
+  const askDelete = (id: number) => setConfirm({ open: true, id });
+  const cancelDelete = () => setIsOpenDelete(false);
+
+  const confirmDelete = async () => {
+    if (confirm.id == null) return;
+    setLoadingId(confirm.id);
+    try {
+      await deleteUsuarioAPI(confirm.id);
+      showNotification('success', 'Usuario Eliminado Correctamente')
+      await refreshUsuarios();
+      setIsOpenDelete(false)
+    } catch (e: any) {
+      console.error('Error al eliminar usuario', e?.response?.data || e);
+    } finally {
+      setLoadingId(null);
+      setConfirm({ open: false, id: null });
+    }
+  };
+
+  const onToggleBloqueado = async (id: number) => {
+    setLoadingId(id);
+    try {
+      const { data } = await toggleBloqueadoAPI(id);
+      const blocked = data?.bloqueado ?? data?.is_bloqueado ?? null;
+      console.log(blocked ? 'Usuario bloqueado' : 'Usuario desbloqueado');
+      await refreshUsuarios();
+    } catch (e: any) {
+      console.error('Error al cambiar estado', e?.response?.data || e);
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -171,24 +243,71 @@ export default function UsuariosView() {
                       <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Usuario</TableCell>
                       <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Email</TableCell>
                       <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Rol</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Estado</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }} align="right">Acciones</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {usuarios.map((u) => (
-                      <TableRow key={u.id_usuario}>
-                        <TableCell sx={{ padding: '8px 16px' }}>
-                          {u.nombre} {u.apellido}
-                        </TableCell>
-                        <TableCell sx={{ padding: '8px 16px' }}>{u.nombre_usuario}</TableCell>
-                        <TableCell sx={{ padding: '8px 16px' }}>{u.email}</TableCell>
-                        <TableCell sx={{ padding: '8px 16px' }}>
-                          {roleMap.get(u.id_rol) ?? `Rol #${u.id_rol}`}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {usuarios.map((u) => {
+                      const blocked = isUsuarioBloqueado(u);
+                      const busy = loadingId === u.id_usuario;
+                      return (
+                        <TableRow key={u.id_usuario}>
+                          <TableCell sx={{ padding: '8px 16px' }}>
+                            {u.nombre} {u.apellido}
+                          </TableCell>
+                          <TableCell sx={{ padding: '8px 16px' }}>{u.nombre_usuario}</TableCell>
+                          <TableCell sx={{ padding: '8px 16px' }}>{u.email}</TableCell>
+                          <TableCell sx={{ padding: '8px 16px' }}>
+                            {roleMap.get(u.id_rol) ?? `Rol #${u.id_rol}`}
+                          </TableCell>
+                          <TableCell sx={{ padding: '8px 16px' }}>
+                            <Chip
+                              label={isUsuarioBloqueado(u) ? 'Bloqueado' : 'Activo'}
+                              size="small"
+                              sx={{
+                                bgcolor: isUsuarioBloqueado(u) ? 'error.main' : 'success.main',
+                                color: 'common.white',
+                                fontWeight: 600,
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ padding: '8px 16px' }} align="right">
+                            {/* Bloquear / Desbloquear */}
+                            <Tooltip title={blocked ? 'Desbloquear' : 'Bloquear'}>
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => onToggleBloqueado(u.id_usuario)}
+                                  disabled={busy}
+                                >
+                                  {blocked ? <FaUnlock /> : <FaLock />}
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+
+                            {/* Eliminar */}
+                            <Tooltip title="Eliminar">
+                              <span>
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => {askDelete(u.id_usuario) 
+                                                  setIsOpenDelete(true);
+                                  }}
+                                  disabled={busy}
+                                >
+                                  <FaTrash />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                     {usuarios.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={4} sx={{ padding: '16px', textAlign: 'center', color: 'text.secondary' }}>
+                        <TableCell colSpan={6} sx={{ padding: '16px', textAlign: 'center', color: 'text.secondary' }}>
                           No hay usuarios para mostrar.
                         </TableCell>
                       </TableRow>
@@ -240,10 +359,16 @@ export default function UsuariosView() {
         )}
       </div>
 
-      {/* Modal Agregar Usuario (placeholder) */}
-<Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
-  <UsuarioForm onSubmit={handleAddUser} roles={roles} />
-</Modal>
+      <Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
+        <UsuarioForm onSubmit={handleAddUser} roles={roles} />
+      </Modal>
+
+      {isOpenDelete &&(
+        <ConfirmAction
+          onCancel={cancelDelete}
+          onConfirm={confirmDelete}
+        />
+      )}
     </div>
   );
 }
