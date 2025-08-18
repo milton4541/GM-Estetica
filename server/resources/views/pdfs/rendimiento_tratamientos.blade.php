@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rendimiento por Tratamiento</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #000; padding: 5px; }
+        th { background: #eee; }
     </style>
 </head>
 <body>
     <h1>Rendimiento por Tratamiento</h1>
+
+    <!-- Tabla de rendimiento -->
     <table>
         <thead>
             <tr>
@@ -20,11 +21,12 @@
                 <th>Ingreso Total ($)</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tablaRendimiento">
+            <!-- Bucle para mostrar los datos del rendimiento -->
             @foreach($rendimiento as $item)
                 <tr>
                     <td>{{ $item->tratamiento }}</td>
-                    <td>{{ number_format($item->ingreso_total, 2, ',', '.') }}</td>
+                    <td>${{ number_format($item->ingreso_total, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>

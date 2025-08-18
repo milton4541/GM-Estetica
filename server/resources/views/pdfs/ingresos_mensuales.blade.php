@@ -1,17 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Reporte de Ingresos Mensuales</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 14px; }
-        h1, h3 { text-align: center; margin: 0; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .filters { margin-top: 10px; font-size: 12px; color: #555; text-align: center; }
+        body { font-family: sans-serif; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #333; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
-        tfoot td { font-weight: bold; }
+        h1 { text-align: center; }
     </style>
 </head>
 <body>

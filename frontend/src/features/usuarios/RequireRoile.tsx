@@ -11,7 +11,7 @@ export default function RequireRole({ roles, children }: Props) {
   if (!isAuthenticated) return <Navigate to="/" replace />;
 
   const role = Number(user?.id_rol ?? user?.role_id) as RoleId | undefined;
-  if (!role || !roles.includes(role)) return <Navigate to="/403" replace />;
+  if (!role || !roles.includes(role)) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }
