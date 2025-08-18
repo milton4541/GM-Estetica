@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <title>Rendimiento por Tratamiento</title>
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #000; padding: 5px; }
-        th { background: #eee; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h1 { text-align: center; }
     </style>
 </head>
 <body>
@@ -15,14 +17,14 @@
         <thead>
             <tr>
                 <th>Tratamiento</th>
-                <th>Ingreso Total</th>
+                <th>Ingreso Total ($)</th>
             </tr>
         </thead>
         <tbody>
             @foreach($rendimiento as $item)
                 <tr>
                     <td>{{ $item->tratamiento }}</td>
-                    <td>${{ number_format($item->ingreso_total, 2) }}</td>
+                    <td>{{ number_format($item->ingreso_total, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>

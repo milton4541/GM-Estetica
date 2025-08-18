@@ -158,7 +158,6 @@ public function login(Request $request)
     // Usuario autenticado
     $user = JWTAuth::user() ?? JWTAuth::setToken($token)->toUser();
 
-    // Verificar si está bloqueado o eliminado
     if ($user->bloqueado || $user->eliminado) {
         return response()->json([
             'error' => 'El usuario está bloqueado o eliminado. Contacte al administrador.',
