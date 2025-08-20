@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Factura;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Tag(
@@ -89,29 +90,26 @@ class ReporteAdministrativoController extends Controller
      *     )
      * )
      */
+    public function ingresosTotales(Request $request)
+    {
+        $query = Factura::query();
 
-    /* se puede filtrar por rango de fechas, Finicio y Ffin*/ 
-public function ingresosTotales(Request $request)
-{
-    $query = Factura::query();
+        if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+            $query->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin]);
+        } elseif ($request->filled('fecha_inicio')) {
+            $query->whereDate('created_at', '>=', $request->fecha_inicio);
+        } elseif ($request->filled('fecha_fin')) {
+            $query->whereDate('created_at', '<=', $request->fecha_fin);
+        }
 
-    // ✅ Soporta inicio/fin opcionales
-    if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
-        $query->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin]);
-    } elseif ($request->filled('fecha_inicio')) {
-        $query->whereDate('created_at', '>=', $request->fecha_inicio);
-    } elseif ($request->filled('fecha_fin')) {
-        $query->whereDate('created_at', '<=', $request->fecha_fin);
+        $total = (float) $query->sum('importe_final');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ingresos totales calculados correctamente',
+            'total'   => $total,
+        ], 200);
     }
-
-    $total = (float) $query->sum('importe_final');
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Ingresos totales calculados correctamente',
-        'total'   => $total,
-    ], 200);
-}
 
     /**
      * @OA\Get(
@@ -141,38 +139,36 @@ public function ingresosTotales(Request $request)
      * )
      */
     public function exportarIngresosTotalesPdf(Request $request)
-{
-    try {
-        $query = Factura::query();
+    {
+        try {
+            $query = Factura::query();
 
-        // ✅ Mismo criterio de filtros que el JSON
-        if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
-            $query->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin]);
-        } elseif ($request->filled('fecha_inicio')) {
-            $query->whereDate('created_at', '>=', $request->fecha_inicio);
-        } elseif ($request->filled('fecha_fin')) {
-            $query->whereDate('created_at', '<=', $request->fecha_fin);
+            if ($request->filled('fecha_inicio') && $request->filled('fecha_fin')) {
+                $query->whereBetween('created_at', [$request->fecha_inicio, $request->fecha_fin]);
+            } elseif ($request->filled('fecha_inicio')) {
+                $query->whereDate('created_at', '>=', $request->fecha_inicio);
+            } elseif ($request->filled('fecha_fin')) {
+                $query->whereDate('created_at', '<=', $request->fecha_fin);
+            }
+
+            $total = (float) $query->sum('importe_final');
+
+            $pdf = Pdf::loadView('pdfs.ingresos_totales', [
+                'total'        => $total,
+                'fechaInicio'  => $request->input('fecha_inicio'),
+                'fechaFin'     => $request->input('fecha_fin'),
+            ]);
+
+            return $pdf->download('ingresos_totales.pdf');
+        } catch (\Throwable $e) {
+            Log::error('PDF ingresos totales - error', ['msg' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo generar el PDF de ingresos totales.',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        $total = (float) $query->sum('importe_final');
-
-        // ✅ Enviamos las 3 variables que el Blade necesita
-        $pdf = Pdf::loadView('pdfs.ingresos_totales', [
-            'total'        => $total,
-            'fechaInicio'  => $request->input('fecha_inicio'), // <-- nombre que usa tu Blade
-            'fechaFin'     => $request->input('fecha_fin'),    // <-- nombre que usa tu Blade
-        ]);
-
-        return $pdf->download('ingresos_totales.pdf');
-    } catch (\Throwable $e) {
-        Log::error('PDF ingresos totales - error', ['msg' => $e->getMessage()]);
-        return response()->json([
-            'success' => false,
-            'message' => 'No se pudo generar el PDF de ingresos totales.',
-            'error'   => $e->getMessage(),
-        ], 500);
     }
-}
 
     /**
      * @OA\Get(
@@ -194,16 +190,14 @@ public function ingresosTotales(Request $request)
      *     )
      * )
      */
-
-    /*se filtra por mes en formato año/mes */
     public function ingresosPorMes(Request $request)
     {
-        $query = Factura::selectRaw("strftime('%Y-%m', created_at) as mes, sum(importe_final) as total")
-            ->groupBy('mes')
-            ->orderBy('mes');
+        $query = Factura::select(DB::raw("FORMAT(created_at, 'yyyy-MM') as mes"), DB::raw("SUM(importe_final) as total"))
+            ->groupBy(DB::raw("FORMAT(created_at, 'yyyy-MM')"))
+            ->orderBy(DB::raw("FORMAT(created_at, 'yyyy-MM')"));
 
         if ($request->filled('mes')) {
-            $query->having('mes', '=', $request->mes);
+            $query->havingRaw("FORMAT(created_at, 'yyyy-MM') = ?", [$request->mes]);
         }
 
         $ingresos = $query->get();
@@ -237,12 +231,12 @@ public function ingresosTotales(Request $request)
      */
     public function exportarIngresosMensualesPdf(Request $request)
     {
-        $query = Factura::selectRaw("strftime('%Y-%m', created_at) as mes, sum(importe_final) as total")
-            ->groupBy('mes')
-            ->orderBy('mes');
+        $query = Factura::select(DB::raw("FORMAT(created_at, 'yyyy-MM') as mes"), DB::raw("SUM(importe_final) as total"))
+            ->groupBy(DB::raw("FORMAT(created_at, 'yyyy-MM')"))
+            ->orderBy(DB::raw("FORMAT(created_at, 'yyyy-MM')"));
 
         if ($request->filled('mes')) {
-            $query->having('mes', '=', $request->mes);
+            $query->havingRaw("FORMAT(created_at, 'yyyy-MM') = ?", [$request->mes]);
         }
 
         $ingresos = $query->get();
@@ -272,17 +266,16 @@ public function ingresosTotales(Request $request)
      *     )
      * )
      */
-
     public function rendimientoPorTratamiento(Request $request)
     {
-        $query = DB::table('factura')
-            ->join('tratamiento', 'tratamiento.id_tratamiento', '=', 'factura.id_tratamiento')
-            ->select('tratamiento.descripcion as tratamiento', DB::raw('SUM(factura.importe_final) as ingreso_total'))
-            ->groupBy('tratamiento.descripcion')
+        $query = DB::table('facturas')
+            ->join('tratamientos', 'tratamientos.id_tratamiento', '=', 'facturas.id_tratamiento')
+            ->select('tratamientos.descripcion as tratamiento', DB::raw('SUM(facturas.importe_final) as ingreso_total'))
+            ->groupBy('tratamientos.descripcion')
             ->orderByDesc('ingreso_total');
 
         if ($request->filled('tratamiento')) {
-            $query->where('tratamiento.descripcion', 'LIKE', '%' . $request->tratamiento . '%');
+            $query->where('tratamientos.descripcion', 'LIKE', '%' . $request->tratamiento . '%');
         }
 
         $rendimiento = $query->get();

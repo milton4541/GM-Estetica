@@ -15,21 +15,25 @@ return new class extends Migration
             $table->increments('doc_id');
             $table->string('nombre_doc');
             $table->string('url'); // e.g. "archivos/uuid.png"
-            $table->unsignedInteger('historial_id'); 
+
+            // FK a historial
+            $table->unsignedInteger('historial_id');
+            $table->foreign('historial_id')
+                  ->references('id_historial')
+                  ->on('historial')
+                  ->onDelete('cascade');
+
             $table->uuid('doc_trabajo_guid')->unique();
             $table->boolean('eliminado')->default(false);
             $table->timestamps();
-
-            $table->foreign('historial_id') // cambio aquí
-                  ->references('id_historial')
-                  ->on('historial') // tabla historial
-                  ->onDelete('cascade');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down()
     {
         Schema::dropIfExists('doc_trabajos');
     }
 };
-

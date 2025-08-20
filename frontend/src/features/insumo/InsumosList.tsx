@@ -91,7 +91,7 @@ const handleRestock = (row: insumoWithId) => {
                   <TableCell sx={{ padding: '8px 16px' }}>{row.componentes}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.nombre}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>
-                    {row.precio_insumo.toFixed(2)}
+                    {row.precio_insumo ? Number(row.precio_insumo).toFixed(2) : '0.00'}
                   </TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.cantidad}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.cantidad_min}</TableCell>

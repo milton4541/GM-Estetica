@@ -13,12 +13,21 @@ return new class extends Migration
     {
         Schema::create('tratamiento_insumo', function (Blueprint $table) {
             $table->id('id');
-            $table->foreignId('id_tratamiento')
-                  ->constrained('tratamientos', 'id_tratamiento')
+
+            // FK al tratamiento (BIGINT unsigned)
+            $table->unsignedBigInteger('id_tratamiento');
+            $table->foreign('id_tratamiento')
+                  ->references('id_tratamiento')
+                  ->on('tratamientos')
                   ->onDelete('cascade');
-            $table->foreignId('id_insumo')
-                  ->constrained('insumos', 'id_insumo')
+
+            // FK al insumo (INT unsigned)
+            $table->unsignedInteger('id_insumo');
+            $table->foreign('id_insumo')
+                  ->references('id_insumo')
+                  ->on('insumos')
                   ->onDelete('cascade');
+
             $table->timestamps();
         });
     }

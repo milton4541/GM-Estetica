@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            // PK autoincremental
-            $table->increments('id_usuario');
-
-            // Datos del usuario
+            $table->id('id_usuario'); // BIGINT unsigned, coincide con rol.id
             $table->string('nombre', 100);
             $table->string('apellido', 100);
             $table->string('email')->unique();
@@ -23,13 +20,12 @@ return new class extends Migration
             $table->string('nombre_usuario', 50)->unique();
 
             // FK al rol
-            $table->unsignedInteger('id_rol');
+            $table->unsignedBigInteger('id_rol'); // coincide con rol.id
             $table->foreign('id_rol')
                   ->references('id')
                   ->on('rols')
                   ->onDelete('cascade');
 
-            // created_at y updated_at
             $table->timestamps();
         });
     }

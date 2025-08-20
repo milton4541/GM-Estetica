@@ -19,6 +19,11 @@ class Turno extends Model
         'finalizado', 
     ];
 
+    // Casteo de tipos
+    protected $casts = [
+        'finalizado' => 'boolean',
+    ];
+
     // Relación: un turno pertenece a un tratamiento
     public function tratamiento()
     {
@@ -29,6 +34,5 @@ class Turno extends Model
     public function paciente()
     {
         return $this->belongsTo(Paciente::class, 'id_paciente', 'id_paciente');
-    }
-    
+    }  
 }

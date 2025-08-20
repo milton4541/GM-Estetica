@@ -1,13 +1,27 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import useFactura from './hooks/useFactura';
-import usePacients from '../paciente/hooks/usePacient';
-import useTratamientos from '../tratamiento/hooks/useTratamientos';
-import LoadingSpinner from '../../components/LoadingSpinner'; // ajusta el path si hace falta
+import { useEffect, useState } from 'react';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import type { FacturaWithRelations } from './types/Factura';
+import { getFacturas } from './api/getFacturas';
 
 export default function FacturaList() {
-  const { factura, loading } = useFactura();
-  const { pacient } = usePacients();
-  const { tratamientos } = useTratamientos();
+  const [facturas, setFacturas] = useState<FacturaWithRelations[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchFacturas = async () => {
+      try {
+        const response = await getFacturas();
+        setFacturas(response); // response debe venir con paciente y tratamiento anidados
+      } catch (error) {
+        console.error('Error cargando facturas:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFacturas();
+  }, []);
 
   if (loading) {
     return (
@@ -26,7 +40,7 @@ export default function FacturaList() {
           <Table>
             <TableHead className="bg-gray-50 uppercase">
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Codigo Factura</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Código Factura</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Importe</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Descuento Precio</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', padding: '12px 16px' }}>Descuento Porcentaje</TableCell>
@@ -37,32 +51,27 @@ export default function FacturaList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {factura.map(row => {
-                const pac = pacient.find(p => p.id_paciente === row.id_paciente);
-                const trat = tratamientos.find(t => t.id_tratamiento === row.id_tratamiento);
+              {facturas.map((row) => (
+                <TableRow key={row.factura_id}>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.factura_id}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.importe}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>${row.descuento_precio}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.descuento_porcentaje}%</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.importe_final}</TableCell>
 
-                return (
-                  <TableRow key={row.factura_id}>
-                    <TableCell sx={{ padding: '8px 16px' }}>{row.factura_id}</TableCell>
-                    <TableCell sx={{ padding: '8px 16px' }}>{row.importe}</TableCell>
-                    <TableCell sx={{ padding: '8px 16px' }}>${row.descuento_precio}</TableCell>
-                    <TableCell sx={{ padding: '8px 16px' }}>{row.descuento_porcentaje}%</TableCell>
-                    <TableCell sx={{ padding: '8px 16px' }}>{row.importe_final}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    {row.paciente ? `${row.paciente.nombre} ${row.paciente.apellido}` : '—'}
+                  </TableCell>
 
-                    <TableCell sx={{ padding: '8px 16px' }}>
-                      {pac ? `${pac.nombre} ${pac.apellido}` : '—'}
-                    </TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    {row.tratamiento ? row.tratamiento.descripcion : '—'}
+                  </TableCell>
 
-                    <TableCell sx={{ padding: '8px 16px' }}>
-                      {trat ? trat.descripcion : '—'}
-                    </TableCell>
-
-                    <TableCell sx={{ padding: '8px 16px' }}>
-                      {new Date(row.created_at).toLocaleDateString('es-AR')}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                  <TableCell sx={{ padding: '8px 16px' }}>
+                    {new Date(row.created_at).toLocaleDateString('es-AR')}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>

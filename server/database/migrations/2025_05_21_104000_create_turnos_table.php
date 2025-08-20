@@ -6,43 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-   Schema::create('turnos', function (Blueprint $table) {
-            // PK autoincremental
-            $table->increments('id_turno');
+        Schema::create('turnos', function (Blueprint $table) {
+            // PK autoincremental como BIGINT
+            $table->bigIncrements('id_turno');
 
-            // Fecha en formato YYYY-MM-DD
+            // Fecha y hora del turno
             $table->date('fecha');
-
-            // Hora en formato 24h (HH:MM:SS)
             $table->time('hora');
 
             // FK al tratamiento
-            $table->unsignedInteger('id_tratamiento');
+            $table->unsignedBigInteger('id_tratamiento');
             $table->foreign('id_tratamiento')
                   ->references('id_tratamiento')
                   ->on('tratamientos')
                   ->onDelete('cascade');
 
             // FK al paciente
-            $table->unsignedInteger('id_paciente');
+            $table->unsignedBigInteger('id_paciente');
             $table->foreign('id_paciente')
                   ->references('id_paciente')
                   ->on('pacientes')
                   ->onDelete('cascade');
 
-            // created_at y updated_at
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('turnos');

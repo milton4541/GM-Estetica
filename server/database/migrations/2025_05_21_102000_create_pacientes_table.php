@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('pacientes', function (Blueprint $table) {
-            // PK autoincremental
-            $table->increments('id_paciente');
+            // PK autoincremental como BIGINT
+            $table->bigIncrements('id_paciente');
 
             // Datos del paciente
             $table->string('dni_paciente', 20)->unique();
@@ -28,9 +25,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('pacientes');

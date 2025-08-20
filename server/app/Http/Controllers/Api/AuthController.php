@@ -60,15 +60,15 @@ class AuthController extends Controller
      */
 public function register(Request $request)
 {
-    $validated = $request->validate([
-        'nombre' => 'required|string|max:255',
-        'apellido' => 'required|string|max:255',
-        'nombre_usuario' => 'required|string|max:144|unique:users,nombre_usuario',
-        'id_rol' => 'nullable|integer',
-        'email' => 'required|string|email|max:255|unique:users,email',
-        'password' => 'required|string|min:8|confirmed', 
-        //al tener el confirmed en el password hay que pasarlo 2 veces
-    ]);
+$validated = $request->validate([
+    'nombre' => 'required|string',
+    'apellido' => 'required|string',
+    'nombre_usuario' => 'required|string|unique:users,nombre_usuario',
+    'id_rol' => 'required|integer',
+    'email' => 'required|string|email|unique:users,email',
+    'password' => 'required|string|min:6|confirmed',
+]);
+
 
     $user = User::create([
         'nombre'         => $validated['nombre'],

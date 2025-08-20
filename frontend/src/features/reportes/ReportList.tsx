@@ -1,14 +1,16 @@
 // src/pages/ReportesView.tsx
 import { useState } from "react";
-
-type TabKey = "totales" | "mensuales" | "rendimiento";
-import { descargarRendimientoTratamientosPdf,  getIngresosTotales,
+import {
+  getIngresosTotales,
   descargarIngresosTotalesPdf,
   getIngresosMensuales,
   descargarIngresosMensualesPdf,
   getRendimientoPorTratamiento,
+  descargarRendimientoTratamientosPdf,
   downloadBlob,
- } from "./reportesAPI";
+} from "./reportesAPI";
+
+type TabKey = "totales" | "mensuales" | "rendimiento";
 
 export default function ReportesView() {
   const [tab, setTab] = useState<TabKey>("totales");
@@ -18,9 +20,7 @@ export default function ReportesView() {
   // ----- Estado filtros -----
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
-
   const [mes, setMes] = useState<string>(""); // formato YYYY-MM
-
   const [tratamiento, setTratamiento] = useState<string>("");
 
   // ----- Estado datos -----
@@ -28,7 +28,7 @@ export default function ReportesView() {
   const [mensuales, setMensuales] = useState<Array<{ mes: string; total: number }>>([]);
   const [rendimiento, setRendimiento] = useState<Array<{ tratamiento: string; ingreso_total: number }>>([]);
 
-  // Helpers
+  // ----- Helpers -----
   const safeExec = async (fn: () => Promise<void>) => {
     setLoading(true);
     setError(null);
@@ -53,9 +53,11 @@ export default function ReportesView() {
 
   const descargarTotales = () =>
     safeExec(async () => {
-      const { blob, filename } = await descargarIngresosTotalesPdf({ fecha_inicio: fechaInicio || undefined,
-        fecha_fin: fechaFin || undefined, });
-downloadBlob(blob, filename);
+      const { blob, filename } = await descargarIngresosTotalesPdf({
+        fecha_inicio: fechaInicio || undefined,
+        fecha_fin: fechaFin || undefined,
+      });
+      downloadBlob(blob, filename);
     });
 
   const verMensuales = () =>
@@ -82,7 +84,7 @@ downloadBlob(blob, filename);
       downloadBlob(blob, "rendimiento_tratamientos.pdf");
     });
 
-  // UI peque con tailwind (puedes cambiar por MUI si prefieres)
+  // ----- Render -----
   return (
     <div className="p-4 max-w-5xl mx-auto">
       <h1 className="text-2xl font-semibold mb-4">Reportes</h1>
@@ -111,13 +113,9 @@ downloadBlob(blob, filename);
 
       {/* Mensajes */}
       {error && (
-        <div className="mb-4 p-3 rounded bg-red-100 text-red-800 border border-red-300">
-          {error}
-        </div>
+        <div className="mb-4 p-3 rounded bg-red-100 text-red-800 border border-red-300">{error}</div>
       )}
-      {loading && (
-        <div className="mb-4 p-3 rounded bg-blue-50 border border-blue-200">Cargando...</div>
-      )}
+      {loading && <div className="mb-4 p-3 rounded bg-blue-50 border border-blue-200">Cargando...</div>}
 
       {/* Contenido pestañas */}
       {tab === "totales" && (
@@ -155,9 +153,7 @@ downloadBlob(blob, filename);
             <h3 className="font-medium mb-2">Resultado</h3>
             <p className="text-2xl">
               {totales !== null ? (
-                <>
-                  $ {totales.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </>
+                <>$ {totales.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>
               ) : (
                 <span className="text-gray-500">Sin datos (haz clic en “Ver”)</span>
               )}
@@ -177,9 +173,7 @@ downloadBlob(blob, filename);
                 value={mes}
                 onChange={(e) => setMes(e.target.value)}
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Déjalo vacío para ver todos los meses.
-              </p>
+              <p className="text-xs text-gray-500 mt-1">Déjalo vacío para ver todos los meses.</p>
             </div>
             <div className="flex items-end gap-2">
               <button onClick={verMensuales} className="px-3 py-2 rounded bg-gray-800 text-white">

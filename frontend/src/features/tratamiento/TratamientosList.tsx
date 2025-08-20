@@ -76,7 +76,7 @@ export default function TratamientoList() {
                 <TableRow key={row.id_tratamiento}>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.descripcion}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>{row.duracion}</TableCell>
-                  <TableCell sx={{ padding: '8px 16px' }}>{row.precio.toFixed(2)}</TableCell>
+                  <TableCell sx={{ padding: '8px 16px' }}>{row.precio ? Number(row.precio).toFixed(2) : '0.00'}</TableCell>
                   <TableCell sx={{ padding: '8px 16px' }}>
                     <IconButton
                       onClick={() => {
