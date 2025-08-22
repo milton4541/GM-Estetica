@@ -14,12 +14,15 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TurnoController;
 use App\Http\Controllers\Api\TratamientoInsumoController;
 use App\Http\Controllers\Api\ReporteAdministrativoController;
- 
+use App\Http\Controllers\BackupController;
+
+
 
 //rutas publicas
 Route::post('register',[AuthController::class,'register']);
 Route::post('login',[AuthController::class,'login']);
 Route::post('rol',[AuthController::class,'createRol']);
+Route::controller(BackupController::class)->group(function () {Route::get('backup/crear', 'createBackup');});
 
 //rutas privadas (necesitas auth)
 Route::middleware([IsUserAuth::class])->group(function () {
