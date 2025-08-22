@@ -1,5 +1,5 @@
 // src/pages/ReportesView.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   getIngresosTotales,
   descargarIngresosTotalesPdf,
@@ -7,6 +7,7 @@ import {
   descargarIngresosMensualesPdf,
   getRendimientoPorTratamiento,
   descargarRendimientoTratamientosPdf,
+  getTratamientos,
   downloadBlob,
 } from "./reportesAPI";
 
@@ -20,13 +21,29 @@ export default function ReportesView() {
   // ----- Estado filtros -----
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
-  const [mes, setMes] = useState<string>(""); // formato YYYY-MM
+  const [mes, setMes] = useState<string>("");
   const [tratamiento, setTratamiento] = useState<string>("");
 
   // ----- Estado datos -----
   const [totales, setTotales] = useState<number | null>(null);
   const [mensuales, setMensuales] = useState<Array<{ mes: string; total: number }>>([]);
   const [rendimiento, setRendimiento] = useState<Array<{ tratamiento: string; ingreso_total: number }>>([]);
+  const [tratamientos, setTratamientos] = useState<Array<any>>([]);
+
+  // ----- Traer tratamientos al montar -----
+  useEffect(() => {
+    const fetchTratamientos = async () => {
+      try {
+        const data = await getTratamientos();
+        console.log("Tratamientos API raw:", data);
+        setTratamientos(data);
+      } catch (e) {
+        console.error("Error cargando tratamientos", e);
+        setTratamientos([]);
+      }
+    };
+    fetchTratamientos();
+  }, []);
 
   // ----- Helpers -----
   const safeExec = async (fn: () => Promise<void>) => {
@@ -194,14 +211,14 @@ export default function ReportesView() {
                 </tr>
               </thead>
               <tbody>
-                {mensuales.length === 0 ? (
+                {(mensuales || []).length === 0 ? (
                   <tr>
                     <td colSpan={2} className="px-3 py-4 text-gray-500">
                       Sin datos (haz clic en “Ver”)
                     </td>
                   </tr>
                 ) : (
-                  mensuales.map((row) => (
+                  (mensuales || []).map((row) => (
                     <tr key={row.mes} className="odd:bg-white even:bg-gray-50">
                       <td className="px-3 py-2 border-b">{row.mes}</td>
                       <td className="px-3 py-2 border-b">
@@ -220,14 +237,26 @@ export default function ReportesView() {
         <section className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-[minmax(240px,1fr)_auto] gap-3">
             <div>
-              <label className="block text-sm mb-1">Tratamiento (contiene)</label>
-              <input
-                type="text"
+              <label className="block text-sm mb-1">Tratamiento</label>
+              <select
                 className="w-full rounded border px-3 py-2"
-                placeholder="Ej: Limpieza"
                 value={tratamiento}
                 onChange={(e) => setTratamiento(e.target.value)}
-              />
+              >
+                <option value="">Todos</option>
+                {tratamientos.length > 0 ? (
+                  tratamientos.map((t, index) => (
+                    <option
+                      key={t.id ?? index}
+                      value={t.nombre ?? t.descripcion ?? ""}
+                    >
+                      {t.nombre ?? t.descripcion ?? "sin-nombre"}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No hay tratamientos disponibles</option>
+                )}
+              </select>
             </div>
             <div className="flex items-end gap-2">
               <button onClick={verRendimiento} className="px-3 py-2 rounded bg-gray-800 text-white">
@@ -248,15 +277,15 @@ export default function ReportesView() {
                 </tr>
               </thead>
               <tbody>
-                {rendimiento.length === 0 ? (
+                {(rendimiento || []).length === 0 ? (
                   <tr>
                     <td colSpan={2} className="px-3 py-4 text-gray-500">
                       Sin datos (haz clic en “Ver”)
                     </td>
                   </tr>
                 ) : (
-                  rendimiento.map((row, i) => (
-                    <tr key={i} className="odd:bg-white even:bg-gray-50">
+                  (rendimiento || []).map((row, index) => (
+                    <tr key={row.tratamiento ?? index} className="odd:bg-white even:bg-gray-50">
                       <td className="px-3 py-2 border-b">{row.tratamiento}</td>
                       <td className="px-3 py-2 border-b">
                         $ {Number(row.ingreso_total).toLocaleString("es-AR", {

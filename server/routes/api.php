@@ -90,6 +90,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get('reportes/ingresos-mensuales-pdf', 'exportarIngresosMensualesPdf');
         Route::get('reportes/rendimiento-tratamientos', 'rendimientoPorTratamiento');
         Route::get('reportes/rendimiento-tratamientos-pdf', 'exportarRendimientoTratamientosPdf');
+        Route::get('reportes/tratamientos', 'listarTratamientos');
     });
 
 

@@ -8,6 +8,7 @@ use App\Models\Factura;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use App\Models\Tratamiento;
 
 /**
  * @OA\Tag(
@@ -325,4 +326,38 @@ class ReporteAdministrativoController extends Controller
 
         return $pdf->download('rendimiento_tratamientos.pdf');
     }
+/**
+ * @OA\Get(
+ *     path="/api/tratamientos",
+ *     summary="Obtener lista de todos los tratamientos",
+ *     tags={"Reportes administrativos"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Response(
+ *         response=200,
+ *         description="Listado de tratamientos obtenido correctamente",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(
+ *                 @OA\Property(property="id_tratamiento", type="integer", example=1),
+ *                 @OA\Property(property="descripcion", type="string", example="Limpieza facial")
+ *             )
+ *         )
+ *     )
+ * )
+ */
+public function listarTratamientos()
+{
+    $tratamientos = Tratamiento::select('id_tratamiento', 'descripcion')
+        ->orderBy('descripcion')
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Listado de tratamientos obtenido correctamente',
+        'data' => $tratamientos
+    ], 200);
 }
+
+
+}
+

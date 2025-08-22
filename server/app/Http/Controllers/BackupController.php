@@ -2,38 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class BackupController extends Controller
 {
     /**
-     * Crear un backup de la base de datos SQL Server
+     * Crear un backup de la base de datos SQL Server usando sqlcmd
      */
     public function createBackup()
     {
         $database = env('DB_DATABASE'); // Nombre de la BD desde .env
-        $backupDir = storage_path('app/backups'); // Carpeta en storage/app/backups
+        $backupDir = 'C:\\backups_sql'; // Carpeta para backups
+        $backupFile = $backupDir . "\\{$database}_" . date('Y-m-d_H-i-s') . ".bak";
 
         // Si no existe la carpeta, la crea
         if (!file_exists($backupDir)) {
             mkdir($backupDir, 0755, true);
         }
 
-        // Nombre del archivo con fecha y hora
-        $backupFile = $backupDir . "/{$database}_" . date('Y-m-d_H-i-s') . ".bak";
+        // Credenciales de SQL Server desde .env
+        $username = env('DB_USERNAME');
+        $password = env('DB_PASSWORD');
+        $server   = env('DB_HOST') . ',' . env('DB_PORT'); // ej: 127.0.0.1,1433
 
-        // Query de backup
-        $query = "BACKUP DATABASE [$database] TO DISK = N'$backupFile' WITH INIT, FORMAT";
+        // Comando sqlcmd para ejecutar el backup
+        $command = "sqlcmd -S $server -U $username -P $password -Q \"BACKUP DATABASE [$database] TO DISK = N'$backupFile' WITH INIT, FORMAT\"";
 
-        try {
-            DB::statement($query);
+        // Ejecutar comando
+        exec($command, $output, $returnVar);
+
+        if ($returnVar === 0) {
             return response()->json([
                 'message' => 'Backup creado exitosamente',
-                'file' => $backupFile
+                'file' => $backupFile,
+                'output' => $output
             ]);
-        } catch (\Exception $e) {
+        } else {
             return response()->json([
-                'error' => $e->getMessage()
+                'error' => 'No se pudo crear el backup',
+                'output' => $output,
+                'returnVar' => $returnVar
             ], 500);
         }
     }

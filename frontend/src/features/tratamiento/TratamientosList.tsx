@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 
@@ -22,6 +22,11 @@ export default function TratamientoList() {
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [selectedTratamiento, setSelectedTratamiento] = useState<TratamientoWithId | null>(null);
+
+  // Debug: ver cómo vienen los datos
+  useEffect(() => {
+    console.log('Tratamientos:', tratamientos);
+  }, [tratamientos]);
 
   const handleAdd = async (tratamiento: Tratamiento) => {
     addTratamiento(tratamiento);
@@ -72,37 +77,43 @@ export default function TratamientoList() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {tratamientos.map((row) => (
-                <TableRow key={row.id_tratamiento}>
-                  <TableCell sx={{ padding: '8px 16px' }}>{row.descripcion}</TableCell>
-                  <TableCell sx={{ padding: '8px 16px' }}>{row.duracion}</TableCell>
-                  <TableCell sx={{ padding: '8px 16px' }}>{row.precio ? Number(row.precio).toFixed(2) : '0.00'}</TableCell>
-                  <TableCell sx={{ padding: '8px 16px' }}>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedTratamiento(row);
-                        setIsOpenEdit(true);
-                      }}
-                      className="text-blue-600 hover:text-blue-900 transition-all"
-                      disabled={loading}
-                    >
-                      <FaEdit />
-                    </IconButton>
-                  </TableCell>
-                  <TableCell sx={{ padding: '8px 16px' }}>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedTratamiento(row);
-                        setIsOpenDelete(true);
-                      }}
-                      className="text-red-600 hover:text-red-900 transition-all"
-                      disabled={loading}
-                    >
-                      <FaTrash />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {tratamientos.map((row) => {
+                // Mapear valores temporales si no existen
+                const duracion = row.duracion ?? '30';  // ejemplo 30 min por defecto
+                const precio = row.precio != null ? Number(row.precio).toFixed(2) : '500.00'; // ejemplo $500 por defecto
+
+                return (
+                  <TableRow key={row.id_tratamiento}>
+                    <TableCell sx={{ padding: '8px 16px' }}>{row.descripcion ?? '-'}</TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>{duracion}</TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>{precio}</TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>
+                      <IconButton
+                        onClick={() => {
+                          setSelectedTratamiento(row);
+                          setIsOpenEdit(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-900 transition-all"
+                        disabled={loading}
+                      >
+                        <FaEdit />
+                      </IconButton>
+                    </TableCell>
+                    <TableCell sx={{ padding: '8px 16px' }}>
+                      <IconButton
+                        onClick={() => {
+                          setSelectedTratamiento(row);
+                          setIsOpenDelete(true);
+                        }}
+                        className="text-red-600 hover:text-red-900 transition-all"
+                        disabled={loading}
+                      >
+                        <FaTrash />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>

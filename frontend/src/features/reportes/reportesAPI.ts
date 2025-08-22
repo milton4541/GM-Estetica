@@ -17,7 +17,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-
 // Helper para descarga de blobs (PDFs)
 export function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -81,7 +80,6 @@ export const descargarIngresosTotalesPdf = async (params: { fecha_inicio?: strin
       },
     });
 
-    // intenta tomar el nombre del header
     const dispo = res.headers["content-disposition"] as string | undefined;
     let filename = "ingresos_totales.pdf";
     if (dispo) {
@@ -164,3 +162,20 @@ export const descargarRendimientoTratamientosPdf = async (params: { tratamiento?
   }
 };
 
+// ---------- Obtener tratamientos ----------
+export const getTratamientos = async () => {
+  try {
+    const token = localStorage.getItem("authToken");
+    const res = await axios.get(`${API_BASE}/tratamientos`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+    // ⚡ Asegurarse de que siempre devuelva un array
+    return Array.isArray(res.data?.data) ? res.data.data : [];
+  } catch (e) {
+    throw await parseBlobError(e);
+  }
+};
