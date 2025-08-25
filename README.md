@@ -77,7 +77,8 @@ MAIL_FROM_NAME="${APP_NAME}"
 L5_SWAGGER_GENERATE_ALWAYS=true
 JWT_SECRET=tu_jwt_secret
 
-
+---
+```bash
 ## Instalación Backend
 - git clone https://github.com/usuario/GM-Estetica.git
 - cd GM-Estetica/backend
@@ -228,3 +229,6 @@ Limpiar filtro
 Editar registro
 
 Eliminar registro
+
+
+---
