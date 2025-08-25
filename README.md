@@ -1,36 +1,50 @@
-<?php
-/*
-================================================================================
-📄 README + Manual de Usuario – GM Estética
-================================================================================
+# GM Estética
 
-DESCRIPCIÓN
-------------
-GM Estética es un sistema de gestión para clínica estética desarrollado en Laravel
-con base de datos SQL Server. Permite administrar pacientes, tratamientos, insumos,
-turnos, facturas e historial, con gestión de usuarios y roles.
+Sistema de gestión para clínica estética desarrollado en **Laravel** con base de datos **SQL Server**. Permite administrar **pacientes, tratamientos, insumos, turnos, facturas e historial**, con **gestión de usuarios y roles**.
 
-TECNOLOGÍAS UTILIZADAS
-----------------------
-Backend: Laravel 11 (PHP 8.3)
-Base de datos: SQL Server
-Autenticación: JWT
-Documentación API: Swagger (l5-swagger)
-Frontend: Vite + React / Blade
-Servidor local: Laragon / XAMPP
+> **Stack**: Laravel 11 (PHP 8.3) · SQL Server · JWT · Swagger (l5-swagger) · Vite + React/Blade · Laragon/XAMPP
 
-REQUISITOS DEL SISTEMA
-----------------------
-- PHP >= 8.3
-- Composer 2.x
-- Node.js >= 18
-- NPM >= 9
-- SQL Server 2019+
-- Extensión PHP: sqlsrv, pdo_sqlsrv
-- Git (opcional, para clonar repositorio)
+---
 
-CONFIGURACIÓN DE ENTORNO (.env)
---------------------------------
+## Tabla de Contenidos
+- [Tecnologías](#tecnologías)
+- [Requisitos](#requisitos)
+- [Configuración de Entorno](#configuración-de-entorno)
+- [Instalación Backend](#instalación-backend)
+- [Instalación Frontend](#instalación-frontend)
+- [Roles y Permisos](#roles-y-permisos)
+- [Documentación de API](#documentación-de-api)
+- [Mantenimiento](#mantenimiento)
+  - [Backups automáticos](#backups-automáticos)
+  - [Restaurar BD desde .bak (SQL Server)](#restaurar-bd-desde-bak-sql-server)
+- [Manual de Usuario](#manual-de-usuario)
+
+---
+
+## Tecnologías
+- **Backend:** Laravel 11 (PHP 8.3)
+- **Base de datos:** SQL Server
+- **Autenticación:** JWT
+- **Documentación API:** Swagger (l5-swagger)
+- **Frontend:** Vite + React / Blade
+- **Servidor local:** Laragon / XAMPP
+
+## Requisitos
+- PHP ≥ 8.3  
+- Composer 2.x  
+- Node.js ≥ 18 · NPM ≥ 9  
+- SQL Server 2019+  
+- Extensiones PHP: `sqlsrv`, `pdo_sqlsrv`  
+- Git (opcional, para clonar)
+
+---
+
+## Configuración de Entorno
+
+> **Importante:** No subas tu `.env` al repositorio. Usá un archivo como `.env.example` (ver abajo) y cada developer crea su `.env` local.
+
+### `.env.example`
+```ini
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=
@@ -41,150 +55,16 @@ DB_CONNECTION=sqlsrv
 DB_HOST=localhost
 DB_PORT=1433
 DB_DATABASE=GM-Estetica
-DB_USERNAME=fedex
-DB_PASSWORD=fede123
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
 
 MAIL_MAILER=smtp
 MAIL_HOST=sandbox.smtp.mailtrap.io
 MAIL_PORT=2525
-MAIL_USERNAME=27c10c8d0b961b
-MAIL_PASSWORD=e9ba586bc7e763
-MAIL_FROM_ADDRESS="noreply@GMestetica.com"
+MAIL_USERNAME=your_mail_user
+MAIL_PASSWORD=your_mail_pass
+MAIL_FROM_ADDRESS="noreply@gmestetica.local"
 MAIL_FROM_NAME="${APP_NAME}"
 
 L5_SWAGGER_GENERATE_ALWAYS=true
-JWT_SECRET=RsZE7Ebicq1P1bD0RDrS3ADpQkWCyWB1jRUA1npaDL5zmhWBgwqNn6yiCP5nttYz
-
-INSTALACIÓN BACKEND
--------------------
-1. Clonar repositorio:
-   git clone https://github.com/usuario/GM-Estetica.git
-   cd GM-Estetica/backend
-
-2. Instalar dependencias PHP:
-   composer install
-
-3. Instalar dependencias JS:
-   npm install
-
-4. Configurar archivo .env (según ejemplo anterior)
-
-5. Generar clave de aplicación:
-   php artisan key:generate
-
-6. Ejecutar migraciones y seeders:
-   php artisan migrate --seed
-
-7. Levantar servidor:
-   php artisan serve
-   URL: http://localhost:8000
-
-INSTALACIÓN FRONTEND
--------------------
-1. Ir a carpeta frontend:
-   cd frontend
-
-2. Instalar dependencias:
-   npm install
-
-3. Configurar variables de entorno:
-   VITE_API_URL=http://localhost:8000/api
-
-4. Levantar servidor de desarrollo:
-   npm run dev
-
-ROLES Y PERMISOS
-----------------
-- Administrador:
-  Acceso total, gestiona usuarios y roles, accede a todos los módulos.
-- Secretaria:
-  Gestiona pacientes, turnos, facturas, historial y reportes.
-- Empleado:
-  Acceso limitado a tratamientos realizados y consulta de pacientes/insumos.
-
-DOCUMENTACIÓN DE API
--------------------
-Generar documentación con:
-php artisan l5-swagger:generate
-Acceder en navegador:
-http://localhost:8000/api/documentation
-
-MANTENIMIENTO
--------------
-- Backup base de datos: exportar desde SQL Server
-- Actualizar dependencias:
-  composer update
-  npm update
-- Migraciones futuras:
-  php artisan migrate
-
-================================================================================
-MANUAL DE USUARIO
-================================================================================
-
-1. INTRODUCCIÓN
-----------------
-Guía paso a paso para usar GM Estética: registrar pacientes, cargar insumos,
-administrar tratamientos, turnos, facturas e historial.
-
-2. ACCESO AL SISTEMA
--------------------
-1. Abrir navegador y acceder a URL del sistema.
-2. Ingresar usuario y contraseña.
-3. Presionar "Iniciar sesión".
-4. Recuperar contraseña si es necesario.
-
-3. MÓDULO DE PACIENTES
-----------------------
-- Registrar paciente
-- Editar paciente
-- Eliminar o desactivar paciente
-
-4. MÓDULO DE INSUMOS
--------------------
-- Agregar nuevo insumo
-- Editar insumo
-- Eliminar insumo
-- Reabastecer stock
-
-5. MÓDULO DE TRATAMIENTOS
--------------------------
-- Registrar tratamiento
-- Asociar insumos
-- Editar tratamiento
-- Eliminar tratamiento
-
-6. MÓDULO DE TURNOS
--------------------
-- Crear turno
-- Modificar o cancelar turno
-
-7. MÓDULO DE USUARIOS
----------------------
-- Agregar usuario
-- Administrar roles
-- Bloquear usuario
-- Eliminar usuario
-
-8. ROLES Y PERMISOS
--------------------
-- Administrador: acceso total
-- Secretaria: acceso a pacientes, turnos, facturas, historial y reportes
-- Empleado: acceso limitado a tratamientos y consulta de datos
-
-9. MÓDULO DE FACTURAS
---------------------
-- Ver facturas
-- Editar facturas
-- Eliminar facturas
-
-10. MÓDULO DE HISTORIAL
-----------------------
-- Filtrar historial por paciente o tratamiento
-- Limpiar filtro
-- Editar registro
-- Eliminar registro
-
-FIN DEL DOCUMENTO
-================================================================================
-*/
+JWT_SECRET=change_me
