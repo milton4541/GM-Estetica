@@ -1,7 +1,7 @@
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
   Tabs, Tab, CircularProgress, IconButton, Tooltip,
-  Chip
+  Chip,Typography, Card,CardContent,List,ListItem, ListItemText, Box, Divider
 } from '@mui/material';
 import { FaPlus, FaTrash, FaLock, FaUnlock } from 'react-icons/fa';
 import { useEffect, useMemo, useState } from 'react';
@@ -132,7 +132,9 @@ export default function UsuariosView() {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
 
-  const [tab, setTab] = useState<'usuarios' | 'roles'>('usuarios');
+  type TabKey = 'usuarios' | 'roles' | 'backups';
+  const [tab, setTab] = useState<TabKey>('usuarios');
+  const tabIndex = tab === 'usuarios' ? 0 : tab === 'roles' ? 1 : 2;
 
   const { usuarios, loading: loadingUsuarios, error: errorUsuarios, refreshUsuarios } = useUsuarios();
   const { roles, loading: loadingRoles, error: errorRoles } = useRoles();
@@ -214,16 +216,17 @@ const isUsuarioBloqueado = (u: Usuario) => Number(u.bloqueado) === 1;
 
         {/* Tabs */}
         <div className="mb-4">
-          <Tabs
-            value={tab === 'usuarios' ? 0 : 1}
-            onChange={(_, v) => setTab(v === 0 ? 'usuarios' : 'roles')}
-            textColor="primary"
-            indicatorColor="primary"
-          >
-            <Tab label="Usuarios" />
-            <Tab label="Roles" />
-          </Tabs>
-        </div>
+        <Tabs
+          value={tabIndex}
+          onChange={(_, v) => setTab(v === 0 ? 'usuarios' : v === 1 ? 'roles' : 'backups')}
+          textColor="primary"
+          indicatorColor="primary"
+        >
+          <Tab label="Usuarios" />
+          <Tab label="Roles" />
+          <Tab label="Backups" />
+        </Tabs>
+      </div>
 
         {/* Contenido Usuarios */}
         {tab === 'usuarios' && (
@@ -358,6 +361,96 @@ const isUsuarioBloqueado = (u: Usuario) => Number(u.bloqueado) === 1;
           </div>
         )}
       </div>
+
+        {tab === 'backups' && (
+        <Card variant="outlined" sx={{ borderRadius: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Copia de seguridad automática de la base de datos
+            </Typography>
+
+            <Box mb={2}>
+              <Chip label="Frecuencia: Semanal" sx={{ mr: 1 }} />
+              <Chip label="Día y hora: Lunes 22:00" sx={{ mr: 1 }} />
+              <Chip label="Ubicación: C:\\backups_sql" sx={{ mr: 1 }} />
+              <Chip label="Formato: .bak" />
+            </Box>
+
+            <Typography variant="subtitle1" gutterBottom>
+              ¿Cómo funciona?
+            </Typography>
+            <List dense>
+              <ListItem>
+                <ListItemText
+                  primary="Programación"
+                  secondary="Cada lunes a las 22:00 se ejecuta el proceso automático de backup."
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary="Destino"
+                  secondary="El archivo se guarda en C:\backups_sql con extensión .bak."
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary="Alcance"
+                  secondary="Es un backup completo de la base de datos (Full)."
+                />
+              </ListItem>
+            </List>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="subtitle1" gutterBottom>
+              Consejos rápidos
+            </Typography>
+            <List dense>
+              <ListItem>
+                <ListItemText
+                  primary="Espacio en disco"
+                  secondary="Verificá que C: tenga espacio suficiente antes del lunes a las 22:00."
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary="Permisos"
+                  secondary="Asegurate de que el usuario del servicio de SQL/Job tenga permiso de escritura en C:\backups_sql."
+                />
+              </ListItem>
+            </List>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="subtitle1" gutterBottom>
+              ¿Cómo restaurar la base desde un .bak? (SQL Server)
+            </Typography>
+
+            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
+{`-- 1) Opcional: ver los archivos lógicos dentro del .bak
+RESTORE FILELISTONLY
+FROM DISK = 'C:\\backups_sql\\MiBase_YYYYMMDD.bak';
+
+-- 2) Restaurar (ajustá nombres de DB y rutas MDF/LDF)
+RESTORE DATABASE MiBase
+FROM DISK = 'C:\\backups_sql\\MiBase_YYYYMMDD.bak'
+WITH
+  MOVE 'MiBase_Data' TO 'C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\MiBase.mdf',
+  MOVE 'MiBase_Log'  TO 'C:\\Program Files\\Microsoft SQL Server\\MSSQL16.MSSQLSERVER\\MSSQL\\DATA\\MiBase_log.ldf',
+  REPLACE,    -- ¡Cuidado! Sobrescribe si ya existe
+  RECOVERY;   -- Deja la DB operativa`}
+            </Typography>
+
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              Alternativa por GUI (SSMS): <em>Object Explorer → Databases (botón derecho) → Restore Database…</em> &rarr; <em>Device</em> &rarr; seleccioná el <code>.bak</code> &rarr; en <em>Files</em> ajustá las rutas si hace falta &rarr; <em>OK</em>.
+            </Typography>
+
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+              Nota: Si el nombre de la base o los archivos lógicos difieren, usá <code>RESTORE FILELISTONLY</code> para obtener los nombres correctos y actualizá las cláusulas <code>MOVE</code>.
+            </Typography>
+          </CardContent>
+        </Card>
+      )}
 
       <Modal isOpen={isOpenAdd} onClose={() => setIsOpenAdd(false)}>
         <UsuarioForm onSubmit={handleAddUser} roles={roles} />

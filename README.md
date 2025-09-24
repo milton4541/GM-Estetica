@@ -25,8 +25,10 @@ REQUISITOS DEL SISTEMA
 - Extensión PHP: sqlsrv, pdo_sqlsrv
 - Git (opcional, para clonar repositorio)
 
-CONFIGURACIÓN DE ENTORNO (.env)
---------------------------------
+---
+
+## Configuración de Entorno (.env)
+```ini
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=
@@ -37,66 +39,52 @@ DB_CONNECTION=sqlsrv
 DB_HOST=localhost
 DB_PORT=1433
 DB_DATABASE=GM-Estetica
-DB_USERNAME=fedex
-DB_PASSWORD=fede123
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_password
 
 MAIL_MAILER=smtp
 MAIL_HOST=sandbox.smtp.mailtrap.io
 MAIL_PORT=2525
-MAIL_USERNAME=27c10c8d0b961b
-MAIL_PASSWORD=e9ba586bc7e763
+MAIL_USERNAME=tu_mail_user
+MAIL_PASSWORD=tu_mail_pass
 MAIL_FROM_ADDRESS="noreply@GMestetica.com"
 MAIL_FROM_NAME="${APP_NAME}"
 
 L5_SWAGGER_GENERATE_ALWAYS=true
-JWT_SECRET=RsZE7Ebicq1P1bD0RDrS3ADpQkWCyWB1jRUA1npaDL5zmhWBgwqNn6yiCP5nttYz
+JWT_SECRET=tu_jwt_secret
 
-INSTALACIÓN BACKEND
--------------------
-1. Clonar repositorio:
-   git clone https://github.com/usuario/GM-Estetica.git
-   cd GM-Estetica/backend
+---
+```bash
+## Instalación Backend
+- git clone https://github.com/usuario/GM-Estetica.git
+- cd GM-Estetica/backend
 
-2. Instalar dependencias PHP:
-   composer install
+- composer install
+- npm install
 
-3. Instalar dependencias JS:
-   npm install
+# Configurar archivo .env
+- php artisan key:generate
+- php artisan migrate --seed
 
-4. Configurar archivo .env (según ejemplo anterior)
+- php artisan serve
+# URL: http://localhost:8000
 
-5. Generar clave de aplicación:
-   php artisan key:generate
+## Instalación Frontend
+- cd frontend
+- npm install
 
-6. Ejecutar migraciones y seeders:
-   php artisan migrate --seed
+# Crear archivo .env.local
+# VITE_API_URL=http://localhost:8000/api
 
-7. Levantar servidor:
-   php artisan serve
-   URL: http://localhost:8000
+- npm run dev
 
-INSTALACIÓN FRONTEND
--------------------
-1. Ir a carpeta frontend:
-   cd frontend
+## Roles y Permisos
 
-2. Instalar dependencias:
-   npm install
+- Administrador: Acceso total, gestiona usuarios y roles, accede a todos los módulos.
 
-3. Configurar variables de entorno:
-   VITE_API_URL=http://localhost:8000/api
+- Secretaria: Gestiona pacientes, turnos, facturas, historial y reportes.
 
-4. Levantar servidor de desarrollo:
-   npm run dev
-
-ROLES Y PERMISOS
-----------------
-- Administrador:
-  Acceso total, gestiona usuarios y roles, accede a todos los módulos.
-- Secretaria:
-  Gestiona pacientes, turnos, facturas, historial y reportes.
-- Empleado:
-  Acceso limitado a tratamientos realizados y consulta de pacientes/insumos.
+- Empleado: Acceso limitado a tratamientos realizados y consulta de pacientes/insumos.
 
 DOCUMENTACIÓN DE API
 -------------------
