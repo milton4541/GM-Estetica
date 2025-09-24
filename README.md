@@ -1,8 +1,4 @@
-<?php
-/*
-================================================================================
-📄 README + Manual de Usuario – GM Estética
-================================================================================
+## 📄 Manual de Usuario – GM Estética
 
 DESCRIPCIÓN
 ------------
@@ -117,74 +113,68 @@ MANTENIMIENTO
   npm update
 - Migraciones futuras:
   php artisan migrate
+-------------
 
-================================================================================
-MANUAL DE USUARIO
-================================================================================
-
+# Funciones del sistema
+- 📘 [Manual de Usuario](manual-usuario.md)
 1. INTRODUCCIÓN
-----------------
-Guía paso a paso para usar GM Estética: registrar pacientes, cargar insumos,
-administrar tratamientos, turnos, facturas e historial.
+- Guía paso a paso para usar GM Estética: registrar pacientes, cargar insumos,
+  administrar tratamientos, turnos, facturas e historial.
 
-2. ACCESO AL SISTEMA
 -------------------
-1. Abrir navegador y acceder a URL del sistema.
-2. Ingresar usuario y contraseña.
-3. Presionar "Iniciar sesión".
-4. Recuperar contraseña si es necesario.
+2. ACCESO AL SISTEMA
+- Abrir navegador y acceder a URL del sistema.
+- Ingresar usuario y contraseña.
+- Presionar "Iniciar sesión".
+- Recuperar contraseña si es necesario.
 
-3. MÓDULO DE PACIENTES
 ----------------------
+3. MÓDULO DE PACIENTES
 - Registrar paciente
 - Editar paciente
 - Eliminar o desactivar paciente
 
-4. MÓDULO DE INSUMOS
 -------------------
+4. MÓDULO DE INSUMOS
 - Agregar nuevo insumo
 - Editar insumo
 - Eliminar insumo
 - Reabastecer stock
 
-5. MÓDULO DE TRATAMIENTOS
 -------------------------
+5. MÓDULO DE TRATAMIENTOS
 - Registrar tratamiento
 - Asociar insumos
 - Editar tratamiento
 - Eliminar tratamiento
 
-6. MÓDULO DE TURNOS
 -------------------
+6. MÓDULO DE TURNOS
 - Crear turno
 - Modificar o cancelar turno
 
-7. MÓDULO DE USUARIOS
 ---------------------
+7. MÓDULO DE USUARIOS
 - Agregar usuario
 - Administrar roles
 - Bloquear usuario
 - Eliminar usuario
 
-8. ROLES Y PERMISOS
 -------------------
+8. ROLES Y PERMISOS
 - Administrador: acceso total
 - Secretaria: acceso a pacientes, turnos, facturas, historial y reportes
 - Empleado: acceso limitado a tratamientos y consulta de datos
 
-9. MÓDULO DE FACTURAS
 --------------------
+9. MÓDULO DE FACTURAS
 - Ver facturas
 - Editar facturas
 - Eliminar facturas
 
-10. MÓDULO DE HISTORIAL
 ----------------------
+10. MÓDULO DE HISTORIAL
 - Filtrar historial por paciente o tratamiento
 - Limpiar filtro
 - Editar registro
 - Eliminar registro
-
-FIN DEL DOCUMENTO
-================================================================================
-*/
