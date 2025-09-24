@@ -28,7 +28,6 @@ REQUISITOS DEL SISTEMA
 ---
 
 ## Configuración de Entorno (.env)
-```ini
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=
@@ -53,8 +52,6 @@ MAIL_FROM_NAME="${APP_NAME}"
 L5_SWAGGER_GENERATE_ALWAYS=true
 JWT_SECRET=tu_jwt_secret
 
----
-```bash
 ## Instalación Backend
 - git clone https://github.com/usuario/GM-Estetica.git
 - cd GM-Estetica/backend
