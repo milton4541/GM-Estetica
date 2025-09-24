@@ -7,7 +7,7 @@ con base de datos SQL Server. Permite administrar pacientes, tratamientos, insum
 turnos, facturas e historial, con gestión de usuarios y roles.
 
 TECNOLOGÍAS UTILIZADAS
-----------------------
+---------------------
 Backend: Laravel 11 (PHP 8.3)
 Base de datos: SQL Server
 Autenticación: JWT
